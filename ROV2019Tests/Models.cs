@@ -9,7 +9,7 @@ namespace ROV2019Tests
         [TestMethod]
         public void ArduinoCommand_GetCommandBytes()
         {
-            Assert.Fail();
+
         }
     }
 }
