@@ -15,15 +15,37 @@ namespace ROV2019.Presenters
             this.connection = connection;
         }
 
+        public void Close()
+        {
+            if (isConnected())
+            {
+                stream.Close();
+                client.Close();
+            }
+        }
+
         public bool OpenConnection()
+        {
+           return OpenConnection(1000);
+        }
+
+        public bool OpenConnection(int timeout)
         {
             try
             {
-                client = new TcpClient(connection.IpAddress, connection.Port);
+                client = new TcpClient();
+                var result = client.BeginConnect(connection.IpAddress, connection.Port, null, null);
+                var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromMilliseconds(timeout));
+
+                if (!success)
+                {
+                    return false;
+                }
+
                 stream = client.GetStream();
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return false;
             }
@@ -31,7 +53,11 @@ namespace ROV2019.Presenters
 
         public bool isConnected()
         {
-            return client.Connected;
+            if(client != null && stream != null)
+            {
+                return client.Connected;
+            }
+            return false;
         }
 
         //Sends the authorize command to arduino. Should be the first command sent.
