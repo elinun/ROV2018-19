@@ -26,5 +26,18 @@ namespace ROV2019Tests
             Assert.AreEqual(results.Result.Count, 1);
 
         }
+
+        [TestMethod]
+        public void RunThruster()
+        {
+            ArduinoConnection connProperties = new ArduinoConnection
+            {
+                IpAddress = "10.108.114.65",
+                Port = 1741
+            };
+            ConnectionContext conn = new ConnectionContext(connProperties);
+            conn.OpenConnection();
+            conn.SetThruster(1, 1500);
+        }
     }
 }
