@@ -40,12 +40,13 @@ namespace ROV2019.Presenters
                         IpAddress = firstThreeBytes + lastByte
                     };
                     ConnectionContext connection = new ConnectionContext(connectionProperties);
-                    if (connection.OpenConnection())
+                    if (connection.OpenConnection(500))
                     {
                         discoveredConnections.Add(connectionProperties);
                         if (save)
                             Save(connectionProperties);
                     }
+                    connection.Close();
                     progress.Report(lastByte / 256);
                 }
             });
