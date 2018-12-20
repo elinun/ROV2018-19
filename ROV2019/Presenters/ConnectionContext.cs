@@ -78,17 +78,23 @@ namespace ROV2019.Presenters
             return false;
         }
 
-        public bool SetThruster(int thruster, int value)
+        public bool SetThruster(byte thruster, int value)
         {
             ArduinoCommand command = new ArduinoCommand()
             {
                 Command = Command.SetThruster,
                 NumberOfReturnedBytes = 0
             };
+            command.AddParameter(thruster);
+            command.AddParameter(value);
             if (isConnected())
             {
-                
+                byte[] toWrite = command.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                return true;
             }
+
+            return false;
         }
     }
 }

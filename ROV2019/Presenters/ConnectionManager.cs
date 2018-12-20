@@ -9,7 +9,7 @@ namespace ROV2019.Presenters
 {
     public class ConnectionManager
     {
-        private List<ArduinoConnection> SavedConnections;
+        public List<ArduinoConnection> SavedConnections { get; private set; }
 
         public ConnectionManager()
         {
@@ -58,6 +58,14 @@ namespace ROV2019.Presenters
         {
             this.SavedConnections.Add(connection);
             Properties.Settings.Default.SavedConnections.connections = this.SavedConnections;
+            Properties.Settings.Default.Save();
+        }
+
+        public void Remove(ArduinoConnection connection)
+        {
+            this.SavedConnections.Remove(connection);
+            Properties.Settings.Default.SavedConnections.connections = this.SavedConnections;
+            Properties.Settings.Default.Save();
         }
     }
 }

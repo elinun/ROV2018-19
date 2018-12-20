@@ -19,4 +19,9 @@ namespace ROV2019.Models
         public string FriendlyName { get; set; }
         public int Latency { get; set; }
     }
+
+    public class Trim
+    {
+        
+    }
 }

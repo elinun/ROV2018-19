@@ -12,6 +12,19 @@ namespace ROV2019.Models
         public List<byte[]> Parameters { get; set; }
         public int NumberOfReturnedBytes { get; set; }
 
+        public void AddParameter(string value)
+        {
+
+        }
+
+        public void AddParameter(int value)
+        {
+            byte[] intBytes = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(intBytes);
+            byte[] result = intBytes;
+            Parameters.Add(result);
+        }
         public static byte[] GetBytes(string s)
         {
             return Encoding.ASCII.GetBytes(s);
