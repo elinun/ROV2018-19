@@ -26,6 +26,8 @@ namespace ROV2019.CustomViews
                 scanProgress.Value = progress.Item2;
                 if (progress.Item1 != null)
                     connectionFound.Report(progress.Item1);
+                if (progress.Item2 == 100)
+                    this.Close();
             });
             scanTask = connectionManager.Scan(progressTracker);
         }

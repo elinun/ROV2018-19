@@ -24,12 +24,20 @@ namespace ROV2019.CustomViews
                 AutoSize = true
             };
             this.Controls.Add(name);
+            //IP Label
+            Label ip = new Label()
+            {
+                Text = con.IpAddress + ":" + con.Port,
+                Location = new Point(10,30),
+                AutoSize = true
+            };
+            Controls.Add(ip);
             //Remove Button
             Button removeButton = new Button()
             {
                 Text = "Remove",
                 Tag = con,
-                Location = new Point(75, 25)
+                Location = new Point(75, 45)
             };
             removeButton.Click += OnRemove;
             this.Controls.Add(removeButton);

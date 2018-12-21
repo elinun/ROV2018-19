@@ -9,7 +9,7 @@ namespace ROV2019.Models
     public class ArduinoCommand
     {
         public string Command { get; set; }
-        public List<byte[]> Parameters { get; set; }
+        public List<byte[]> Parameters = new List<byte[]>();
         public int NumberOfReturnedBytes { get; set; }
 
         public void AddParameter(string value)
@@ -27,11 +27,12 @@ namespace ROV2019.Models
         }
         public static byte[] GetBytes(string s)
         {
-            return Encoding.ASCII.GetBytes(s);
+            return Encoding.ASCII.GetBytes(s?? string.Empty);
         }
         public static string GetString(byte[] bytes)
         {
-            return Encoding.ASCII.GetString(bytes);
+            string str = Encoding.ASCII.GetString(bytes);
+            return str.Replace("\0", "");
         }
         
         private List<byte> addAllBytes(List<byte> byteList, byte[] bytes)
@@ -55,7 +56,8 @@ namespace ROV2019.Models
                 command = addAllBytes(command, bytes);
                 command = addAllBytes(command, GetBytes(","));
             }
-            command.RemoveAt(command.Count - 1);
+            if(Parameters.Count>0)
+                command.RemoveAt(command.Count - 1);
             //add bytes to return
             cmd = ":" + NumberOfReturnedBytes + "}";
             command = addAllBytes(command, GetBytes(cmd));
@@ -68,5 +70,6 @@ namespace ROV2019.Models
         public static readonly string Authorize = "authorize";
         public static readonly string SetThruster = "setThruster";
         public static readonly string AnalogRead = "analogRead";
+        public static readonly string GetName = "GetName";
     }
 }

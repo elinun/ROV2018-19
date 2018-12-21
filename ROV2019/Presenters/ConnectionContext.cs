@@ -6,7 +6,7 @@ namespace ROV2019.Presenters
 {
     public class ConnectionContext
     {
-        private ArduinoConnection connection;
+        public ArduinoConnection connection;
         private TcpClient client;
         private NetworkStream stream;
 
@@ -40,7 +40,7 @@ namespace ROV2019.Presenters
                 stream = client.GetStream();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -55,7 +55,25 @@ namespace ROV2019.Presenters
             return false;
         }
 
-        //Sends the authorize command to arduino. Should be the first command sent.
+        public string GetName()
+        {
+            if(isConnected())
+            {
+                ArduinoCommand command = new ArduinoCommand()
+                {
+                    Command = Command.GetName,
+                    NumberOfReturnedBytes = 16
+                };
+                byte[] toWrite = command.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                byte[] toRead = new byte[command.NumberOfReturnedBytes];
+                stream.Read(toRead, 0, toRead.Length);
+                return ArduinoCommand.GetString(toRead);
+            }
+            return "Failed to Get Name";
+        }
+
+        //Sends the authorize command to arduino. Should be the first command sent, besides GetName.
         public bool Authorize()
         {
             ArduinoCommand command = new ArduinoCommand()
@@ -68,7 +86,9 @@ namespace ROV2019.Presenters
             {
                 byte[] toWrite = command.GetCommandBytes();
                 stream.Write(toWrite, 0, toWrite.Length);
-                return true;
+                byte[] toRead = new byte[1];
+                stream.Read(toRead, 0, toRead.Length);
+                return (toRead[0] == 0x01 ? true : false);
             }
             return false;
         }

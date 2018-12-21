@@ -17,6 +17,7 @@ namespace ROV2019
     {
         ConnectionManager connectionManager;
         ArduinoConnection selectedConnection = null;
+        ConnectionContext openConnection = null;
 
         public Main()
         {
@@ -35,7 +36,7 @@ namespace ROV2019
             foreach (ArduinoConnection con in connectionManager.SavedConnections)
             {
                 ConnectionListItem connectionItem = new ConnectionListItem(con, RemoveButton_Click, null, ConnectionSelected);
-                ConnectionsList.Controls.Add(connectionItem, 0, ConnectionsList.RowCount-1);
+                ConnectionsList.Controls.Add(connectionItem, 0, ConnectionsList.RowCount - 1);
             }
         }
 
@@ -47,6 +48,7 @@ namespace ROV2019
                 //unselecting
                 this.selectedConnection = null;
                 ConnectButton.Enabled = false;
+                ConfigureTrimButton.Enabled = false;
                 selectedConn.ToggleSelected();
             }
             else
@@ -56,6 +58,7 @@ namespace ROV2019
                 if(this.selectedConnection == null)
                 {
                     ConnectButton.Enabled = true;
+                    ConfigureTrimButton.Enabled = true;
                     this.selectedConnection = (ArduinoConnection)selectedConn.Tag;
                     selectedConn.ToggleSelected();
                 }
@@ -81,13 +84,36 @@ namespace ROV2019
             {
                 FriendlyName = "Hi"
             };
-            connectionManager.Save(newConn);
+            connectionManager.Add(newConn);
             PopulateConnectionsList();
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-
+            Button button = (Button)sender;
+            if(button.Text.Equals("Connect"))
+            {
+                this.openConnection = new ConnectionContext(this.selectedConnection);
+                openConnection.OpenConnection();
+                //check authorization
+                string userPassword = null;
+                while (!openConnection.Authorize())
+                {
+                    //prompt user for correct password
+                    userPassword = Prompt.ShowDialog("Password Please:", selectedConnection.Password);
+                    selectedConnection.Password = userPassword;
+                    openConnection.connection = selectedConnection;
+                    connectionManager.Save(selectedConnection);
+                    if (userPassword.Equals(""))
+                        return;
+                }
+                button.Text = "Disconnect";
+            }
+            else
+            {
+                openConnection.Close();
+                button.Text = "Connect";
+            }
         }
 
         private void ScanButton_Click(object sender, EventArgs e)
@@ -98,6 +124,11 @@ namespace ROV2019
             });
             ConnectionScanProgressDialog scanProgressDialog = new ConnectionScanProgressDialog(connectionManager, discoverConnectionListener);
             scanProgressDialog.Show();
+        }
+
+        private void ConfigureTrimButton_Click(object sender, EventArgs e)
+        {
+            //TODO: Open ConfigureTrim Dialog, and update associated models
         }
     }
 }

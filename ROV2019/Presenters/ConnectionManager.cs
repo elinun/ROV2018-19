@@ -66,10 +66,10 @@ namespace ROV2019.Presenters
                     ConnectionContext connection = new ConnectionContext(connectionProperties);
                     if (connection.OpenConnection(100))
                     {
-                        //TODO: Get friendly name of discovered ROV
+                        connectionProperties.FriendlyName = connection.GetName();
                         discoveredConnections.Add(connectionProperties);
                         if (save)
-                            Save(connectionProperties);
+                            Add(connectionProperties);
                         progress.Report((connectionProperties, (int)(((double)lastByte / 255.0) * 100)));
                     }
                     connection.Close();
@@ -79,8 +79,15 @@ namespace ROV2019.Presenters
             
             return discoveredConnections;
         }
-
         public void Save(ArduinoConnection connection)
+        {
+            ArduinoConnection oldConToReplace = SavedConnections.FirstOrDefault(c => c.FriendlyName == connection.FriendlyName || c.IpAddress == connection.IpAddress);
+            SavedConnections.Remove(oldConToReplace);
+            SavedConnections.Add(connection);
+            Properties.Settings.Default.SavedConnections.connections = SavedConnections;
+            Properties.Settings.Default.Save();
+        }
+        public void Add(ArduinoConnection connection)
         {
             this.SavedConnections.Add(connection);
             Properties.Settings.Default.SavedConnections.connections = this.SavedConnections;
