@@ -11,8 +11,11 @@ namespace ROV2019.CustomViews
 {
     public class ConnectionListItem : GroupBox
     {
+        public bool Selected = false;
         public ConnectionListItem(ArduinoConnection con, EventHandler OnRemove, EventHandler OnTest, EventHandler OnSelect)
         {
+            this.Tag = con;
+            this.Click += OnSelect;
             //Name Label
             Label name = new Label()
             {
@@ -31,5 +34,15 @@ namespace ROV2019.CustomViews
             removeButton.Click += OnRemove;
             this.Controls.Add(removeButton);
         }
+
+        public bool ToggleSelected()
+        {
+            if (Selected)
+                this.BackColor = Color.Gray;
+            else
+                this.BackColor = Color.Yellow;
+            return (Selected = !Selected);
+        }
+
     }
 }

@@ -24,12 +24,7 @@ namespace ROV2019.Presenters
             }
         }
 
-        public bool OpenConnection()
-        {
-           return OpenConnection(1000);
-        }
-
-        public bool OpenConnection(int timeout)
+        public bool OpenConnection(int timeout = 1000)
         {
             try
             {

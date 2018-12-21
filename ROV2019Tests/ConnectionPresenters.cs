@@ -19,7 +19,7 @@ namespace ROV2019Tests
         {
             ConnectionManager manager = new ConnectionManager();
             int previousProgress = 0;
-            List<ArduinoConnection> results = manager.Scan("192.168.1.", true, new Progress<int>(progress =>
+            List<ArduinoConnection> results = manager.Scan(new Progress<int>(progress =>
             {
                 Assert.IsTrue(progress >= previousProgress);
                 previousProgress = progress;

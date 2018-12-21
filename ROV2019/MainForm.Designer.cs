@@ -76,6 +76,7 @@
             // ConnectButton
             // 
             this.ConnectButton.AutoSize = true;
+            this.ConnectButton.Enabled = false;
             this.ConnectButton.Location = new System.Drawing.Point(4, 376);
             this.ConnectButton.Name = "ConnectButton";
             this.ConnectButton.Size = new System.Drawing.Size(57, 23);

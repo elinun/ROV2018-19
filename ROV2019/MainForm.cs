@@ -16,6 +16,7 @@ namespace ROV2019
     public partial class Main : Form
     {
         ConnectionManager connectionManager;
+        ArduinoConnection selectedConnection = null;
 
         public Main()
         {
@@ -33,9 +34,33 @@ namespace ROV2019
             //populate connections list table
             foreach (ArduinoConnection con in connectionManager.SavedConnections)
             {
-                ConnectionListItem connectionItem = new ConnectionListItem(con, RemoveButton_Click, null, null);
-                ConnectionsList.Controls.Add(connectionItem, 0, ConnectionsList.RowCount);
+                ConnectionListItem connectionItem = new ConnectionListItem(con, RemoveButton_Click, null, ConnectionSelected);
+                ConnectionsList.Controls.Add(connectionItem, 0, ConnectionsList.RowCount-1);
             }
+        }
+
+        private void ConnectionSelected(object sender, EventArgs e)
+        {
+            ConnectionListItem selectedConn = (ConnectionListItem)sender;
+            if (selectedConn.Selected)
+            {
+                //unselecting
+                this.selectedConnection = null;
+                ConnectButton.Enabled = false;
+                selectedConn.ToggleSelected();
+            }
+            else
+            {
+                //selecting
+                //make sure one is not already selected
+                if(this.selectedConnection == null)
+                {
+                    ConnectButton.Enabled = true;
+                    this.selectedConnection = (ArduinoConnection)selectedConn.Tag;
+                    selectedConn.ToggleSelected();
+                }
+            }
+            
         }
 
         private void RemoveButton_Click(object sender, EventArgs e)
@@ -67,7 +92,12 @@ namespace ROV2019
 
         private void ScanButton_Click(object sender, EventArgs e)
         {
-            //TODO: Open Progress Dialog Form
+            Progress<ArduinoConnection> discoverConnectionListener = new Progress<ArduinoConnection>(connection =>
+            {
+                PopulateConnectionsList();
+            });
+            ConnectionScanProgressDialog scanProgressDialog = new ConnectionScanProgressDialog(connectionManager, discoverConnectionListener);
+            scanProgressDialog.Show();
         }
     }
 }
