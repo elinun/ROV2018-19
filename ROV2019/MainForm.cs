@@ -80,11 +80,7 @@ namespace ROV2019
         private void manualAddButton_Click(object sender, EventArgs e)
         {
             //TODO: Open dialog
-            ArduinoConnection newConn = new ArduinoConnection()
-            {
-                FriendlyName = "Hi"
-            };
-            connectionManager.Add(newConn);
+            Prompt.ShowManualConnectionAddDialog(connectionManager);
             PopulateConnectionsList();
         }
 

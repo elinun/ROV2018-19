@@ -47,6 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomViews\ManualConnectionAddDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CustomViews\ManualConnectionAddDialog.Designer.cs">
+      <DependentUpon>ManualConnectionAddDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomViews\Miscellaneous.cs" />
     <Compile Include="CustomViews\ConnectionScanProgressDialog.cs">
       <SubType>Form</SubType>
@@ -72,6 +78,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="CustomViews\ConnectionScanProgressDialog.resx">
       <DependentUpon>ConnectionScanProgressDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomViews\ManualConnectionAddDialog.resx">
+      <DependentUpon>ManualConnectionAddDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

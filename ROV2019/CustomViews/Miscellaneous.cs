@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ROV2019.Presenters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,13 @@ namespace ROV2019.CustomViews
             prompt.AcceptButton = confirmation;
 
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
+
+        public static void ShowManualConnectionAddDialog(ConnectionManager manager)
+        {
+            ManualConnectionAddDialog addDialog = new ManualConnectionAddDialog(manager);
+            addDialog.ShowDialog();
+            return;
         }
     }
 }
