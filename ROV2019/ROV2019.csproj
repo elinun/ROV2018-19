@@ -47,20 +47,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomViews\ManualConnectionAddDialog.cs">
+    <Compile Include="Views\ManualConnectionAddDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CustomViews\ManualConnectionAddDialog.Designer.cs">
+    <Compile Include="Views\ManualConnectionAddDialog.Designer.cs">
       <DependentUpon>ManualConnectionAddDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="CustomViews\Miscellaneous.cs" />
-    <Compile Include="CustomViews\ConnectionScanProgressDialog.cs">
+    <Compile Include="Views\Prompt.cs" />
+    <Compile Include="Views\ConnectionScanProgressDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CustomViews\ConnectionScanProgressDialog.Designer.cs">
+    <Compile Include="Views\ConnectionScanProgressDialog.Designer.cs">
       <DependentUpon>ConnectionScanProgressDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="CustomViews\ListItems.cs">
+    <Compile Include="Views\ListItems.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainForm.cs">
@@ -76,10 +76,16 @@
     <Compile Include="Presenters\ConnectionManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CustomViews\ConnectionScanProgressDialog.resx">
+    <Compile Include="Views\TrimConfigurationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\TrimConfigurationDialog.Designer.cs">
+      <DependentUpon>TrimConfigurationDialog.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Views\ConnectionScanProgressDialog.resx">
       <DependentUpon>ConnectionScanProgressDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CustomViews\ManualConnectionAddDialog.resx">
+    <EmbeddedResource Include="Views\ManualConnectionAddDialog.resx">
       <DependentUpon>ManualConnectionAddDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
@@ -95,6 +101,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Models\Controller.cs" />
+    <EmbeddedResource Include="Views\TrimConfigurationDialog.resx">
+      <DependentUpon>TrimConfigurationDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

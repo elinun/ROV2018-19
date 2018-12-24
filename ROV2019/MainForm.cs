@@ -1,4 +1,4 @@
-﻿using ROV2019.CustomViews;
+﻿using ROV2019.Views;
 using ROV2019.Models;
 using ROV2019.Presenters;
 using System;
@@ -68,6 +68,12 @@ namespace ROV2019
 
         private void RemoveButton_Click(object sender, EventArgs e)
         {
+            if (openConnection != null && openConnection.isConnected())
+                openConnection.Close();
+            openConnection = null;
+            selectedConnection = null;
+            ConnectButton.Enabled = false;
+            ConfigureTrimButton.Enabled = false;
             connectionManager.Remove((ArduinoConnection)((Button)sender).Tag);
             PopulateConnectionsList();
         }
@@ -79,8 +85,7 @@ namespace ROV2019
 
         private void manualAddButton_Click(object sender, EventArgs e)
         {
-            //TODO: Open dialog
-            Prompt.ShowManualConnectionAddDialog(connectionManager);
+            new ManualConnectionAddDialog(connectionManager);
             PopulateConnectionsList();
         }
 
@@ -90,20 +95,26 @@ namespace ROV2019
             if(button.Text.Equals("Connect"))
             {
                 this.openConnection = new ConnectionContext(this.selectedConnection);
-                openConnection.OpenConnection();
-                //check authorization
-                string userPassword = null;
-                while (!openConnection.Authorize())
+                if (openConnection.OpenConnection())
                 {
-                    //prompt user for correct password
-                    userPassword = Prompt.ShowDialog("Password Please:", selectedConnection.Password);
-                    selectedConnection.Password = userPassword;
-                    openConnection.connection = selectedConnection;
-                    connectionManager.Save(selectedConnection);
-                    if (userPassword.Equals(""))
-                        return;
+                    //check authorization
+                    string userPassword = null;
+                    while (!openConnection.Authorize())
+                    {
+                        //prompt user for correct password
+                        userPassword = Dialog.ShowPrompt("Password Please:", selectedConnection.Password);
+                        selectedConnection.Password = userPassword;
+                        openConnection.connection = selectedConnection;
+                        connectionManager.Save(selectedConnection);
+                        if (userPassword.Equals(""))
+                            return;
+                    }
+                    button.Text = "Disconnect";
                 }
-                button.Text = "Disconnect";
+                else
+                {
+                    Dialog.ShowMessageDialog("Error Opening Connection to ROV. Most likely Connection Refused.");
+                }
             }
             else
             {
@@ -124,7 +135,7 @@ namespace ROV2019
 
         private void ConfigureTrimButton_Click(object sender, EventArgs e)
         {
-            //TODO: Open ConfigureTrim Dialog, and update associated models
+            TrimConfigurationDialog configurationDialog = new TrimConfigurationDialog(connectionManager);
         }
     }
 }

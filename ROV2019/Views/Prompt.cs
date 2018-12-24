@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ROV2019.CustomViews
+namespace ROV2019.Views
 {
-    public static class Prompt
+    public static class Dialog
     {
-        public static string ShowDialog(string text, string caption)
+        public static string ShowPrompt(string text, string caption)
         {
             Form prompt = new Form()
             {
@@ -32,11 +32,22 @@ namespace ROV2019.CustomViews
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
 
-        public static void ShowManualConnectionAddDialog(ConnectionManager manager)
+        public static void ShowMessageDialog(string message)
         {
-            ManualConnectionAddDialog addDialog = new ManualConnectionAddDialog(manager);
-            addDialog.ShowDialog();
-            return;
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = "Message",
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            Label textLabel = new Label() { Left = 50, Top = 20, Text = message, AutoSize = true };
+            prompt.Controls.Add(textLabel);
+            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.AcceptButton = confirmation;
+            prompt.ShowDialog();
         }
     }
 }

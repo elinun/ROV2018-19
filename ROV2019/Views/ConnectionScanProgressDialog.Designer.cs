@@ -1,4 +1,4 @@
-﻿namespace ROV2019.CustomViews
+﻿namespace ROV2019.Views
 {
     partial class ConnectionScanProgressDialog
     {

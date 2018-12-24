@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ROV2019.CustomViews
+namespace ROV2019.Views
 {
     public partial class ManualConnectionAddDialog : Form
     {
@@ -23,6 +23,7 @@ namespace ROV2019.CustomViews
 
             this.connectionManager = connectionManager;
             this.AcceptButton = SaveButton;
+            ShowDialog();
         }
 
         private void ShowPasswordButton_MouseDown(object sender, MouseEventArgs e)
