@@ -93,14 +93,41 @@ namespace ROV2019.Presenters
             return false;
         }
 
-        public bool SetThruster(byte thruster, int value)
+        public void MoveVectorWithTrim(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
+        {
+
+        }
+
+        public bool MoveVectorWithPIDAssist(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
+        {
+            ArduinoCommand command = new ArduinoCommand()
+            {
+                Command = Command.MoveWithPID,
+                NumberOfReturnedBytes = 0
+            };
+            command.AddParameter(lateralSpeed);
+            command.AddParameter(forwardSpeed);
+            command.AddParameter(verticalSpeed);
+            command.AddParameter(rotationalSpeed);
+            command.AddParameter(rollSpeed);
+            if (isConnected())
+            {
+                byte[] toWrite = command.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool SetThruster(Thrusters thruster, int value)
         {
             ArduinoCommand command = new ArduinoCommand()
             {
                 Command = Command.SetThruster,
                 NumberOfReturnedBytes = 0
             };
-            command.AddParameter(thruster);
+            command.AddParameter((int)thruster);
             command.AddParameter(value);
             if (isConnected())
             {

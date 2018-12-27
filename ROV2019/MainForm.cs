@@ -40,6 +40,16 @@ namespace ROV2019
             }
         }
 
+
+        private void SetConnectionSpecificButtonsEnabled(bool enabled)
+        {
+            ConnectButton.Enabled = enabled;
+            ConfigureTrimButton.Enabled = enabled;
+            SensorButton.Enabled = enabled;
+        }
+
+        //Click Handlers
+
         private void ConnectionSelected(object sender, EventArgs e)
         {
             ConnectionListItem selectedConn = (ConnectionListItem)sender;
@@ -47,23 +57,21 @@ namespace ROV2019
             {
                 //unselecting
                 this.selectedConnection = null;
-                ConnectButton.Enabled = false;
-                ConfigureTrimButton.Enabled = false;
+                SetConnectionSpecificButtonsEnabled(false);
                 selectedConn.ToggleSelected();
             }
             else
             {
                 //selecting
                 //make sure one is not already selected
-                if(this.selectedConnection == null)
+                if (this.selectedConnection == null)
                 {
-                    ConnectButton.Enabled = true;
-                    ConfigureTrimButton.Enabled = true;
+                    SetConnectionSpecificButtonsEnabled(true);
                     this.selectedConnection = (ArduinoConnection)selectedConn.Tag;
                     selectedConn.ToggleSelected();
                 }
             }
-            
+
         }
 
         private void RemoveButton_Click(object sender, EventArgs e)
@@ -72,15 +80,9 @@ namespace ROV2019
                 openConnection.Close();
             openConnection = null;
             selectedConnection = null;
-            ConnectButton.Enabled = false;
-            ConfigureTrimButton.Enabled = false;
+            SetConnectionSpecificButtonsEnabled(false);
             connectionManager.Remove((ArduinoConnection)((Button)sender).Tag);
             PopulateConnectionsList();
-        }
-
-        private void Main_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void manualAddButton_Click(object sender, EventArgs e)
@@ -99,6 +101,7 @@ namespace ROV2019
                 {
                     //check authorization
                     string userPassword = null;
+                    //TODO: Figure out if API will close socket or not.
                     while (!openConnection.Authorize())
                     {
                         //prompt user for correct password
@@ -109,7 +112,11 @@ namespace ROV2019
                         if (userPassword.Equals(""))
                             return;
                     }
+                    //TODO: Refactor
                     button.Text = "Disconnect";
+                    ConnectionListItem listItem = (ConnectionListItem)ConnectionsList.Controls.Find(selectedConnection.FriendlyName + selectedConnection.Password + selectedConnection.IpAddress, false)[0];
+                    listItem.BackColor = Color.Green;
+                    listItem.Click -= ConnectionSelected;
                 }
                 else
                 {
@@ -120,6 +127,10 @@ namespace ROV2019
             {
                 openConnection.Close();
                 button.Text = "Connect";
+                //TODO: Refactor
+                ConnectionListItem listItem = (ConnectionListItem)ConnectionsList.Controls.Find(selectedConnection.FriendlyName + selectedConnection.Password + selectedConnection.IpAddress, false)[0];
+                listItem.BackColor = Color.Yellow;
+                listItem.Click += ConnectionSelected;
             }
         }
 
@@ -135,7 +146,12 @@ namespace ROV2019
 
         private void ConfigureTrimButton_Click(object sender, EventArgs e)
         {
-            TrimConfigurationDialog configurationDialog = new TrimConfigurationDialog(connectionManager);
+            TrimConfigurationDialog configurationDialog = new TrimConfigurationDialog(connectionManager, selectedConnection);
+        }
+
+        private void SensorButton_Click(object sender, EventArgs e)
+        {
+            //TODO: Open Dialog with senor data.
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ROV2019.Presenters;
+﻿using ROV2019.Models;
+using ROV2019.Presenters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,13 +16,21 @@ namespace ROV2019.Views
     {
 
         ConnectionManager connectionManager;
+        ArduinoConnection connectionProperties;
 
-        public TrimConfigurationDialog(ConnectionManager manager)
+        public TrimConfigurationDialog(ConnectionManager manager, ArduinoConnection connection)
         {
             InitializeComponent();
 
             connectionManager = manager;
+            connectionProperties = connection;
             ShowDialog();
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            
+            Close();
         }
     }
 }

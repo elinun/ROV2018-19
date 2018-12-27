@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ROV2019.Models
+namespace ROV2019.Presenters
 {
-    public class Controllers
+    class ControllerManager
     {
-        public List<Controller> SavedControllers { get; set; }
     }
 }

@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WindowsFormsApp1\ROV4.0\bin\x64\Release\SlimDX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -47,6 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ControllerConfigurations.cs" />
+    <Compile Include="Controllers\PlayStation.cs" />
+    <Compile Include="Presenters\ConnectionControllerMesher.cs" />
+    <Compile Include="Presenters\ControllerManager.cs" />
     <Compile Include="Views\ManualConnectionAddDialog.cs">
       <SubType>Form</SubType>
     </Compile>

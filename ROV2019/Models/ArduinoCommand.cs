@@ -71,5 +71,16 @@ namespace ROV2019.Models
         public static readonly string SetThruster = "setThruster";
         public static readonly string AnalogRead = "analogRead";
         public static readonly string GetName = "GetName";
+        public static readonly string MoveWithPID = "moveWithPIDAssist";
+    }
+
+    public enum Thrusters
+    {
+        FrontLeft = 0,
+        FrontRight = 1,
+        BackLeft = 2,
+        BackRight = 3,
+        VerticalLeft = 4,
+        VerticalRight = 5
     }
 }

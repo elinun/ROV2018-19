@@ -33,24 +33,31 @@
             this.ScanButton = new System.Windows.Forms.Button();
             this.ConnectButton = new System.Windows.Forms.Button();
             this.ConfigureTrimButton = new System.Windows.Forms.Button();
+            this.PIDAssistField = new System.Windows.Forms.CheckBox();
+            this.SensorButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.ControllersListTable = new System.Windows.Forms.TableLayoutPanel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.UseControllerButton = new System.Windows.Forms.Button();
+            this.AddControllerButton = new System.Windows.Forms.Button();
+            this.ConfigureControllerButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ConnectionsList
             // 
+            this.ConnectionsList.AutoScroll = true;
             this.ConnectionsList.AutoSize = true;
-            this.ConnectionsList.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
-            this.ConnectionsList.BackColor = System.Drawing.Color.Gray;
+            this.ConnectionsList.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ConnectionsList.ColumnCount = 1;
             this.ConnectionsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.ConnectionsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.ConnectionsList.Location = new System.Drawing.Point(12, 12);
+            this.ConnectionsList.Location = new System.Drawing.Point(12, 15);
             this.ConnectionsList.Name = "ConnectionsList";
             this.ConnectionsList.RowCount = 1;
-            this.ConnectionsList.AutoScroll = true;
             this.ConnectionsList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.ConnectionsList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.ConnectionsList.Size = new System.Drawing.Size(240, 0);
-            this.ConnectionsList.TabIndex = 0;
+            this.ConnectionsList.Size = new System.Drawing.Size(240, 50);
+            this.ConnectionsList.TabIndex = 1;
             // 
             // manualAddButton
             // 
@@ -90,13 +97,103 @@
             // ConfigureTrimButton
             // 
             this.ConfigureTrimButton.Enabled = false;
-            this.ConfigureTrimButton.Location = new System.Drawing.Point(21, 347);
+            this.ConfigureTrimButton.Location = new System.Drawing.Point(35, 347);
             this.ConfigureTrimButton.Name = "ConfigureTrimButton";
-            this.ConfigureTrimButton.Size = new System.Drawing.Size(75, 23);
+            this.ConfigureTrimButton.Size = new System.Drawing.Size(53, 23);
             this.ConfigureTrimButton.TabIndex = 4;
-            this.ConfigureTrimButton.Text = "Configure Trim";
+            this.ConfigureTrimButton.Text = "Trim";
             this.ConfigureTrimButton.UseVisualStyleBackColor = true;
             this.ConfigureTrimButton.Click += new System.EventHandler(this.ConfigureTrimButton_Click);
+            // 
+            // PIDAssistField
+            // 
+            this.PIDAssistField.AutoSize = true;
+            this.PIDAssistField.BackColor = System.Drawing.SystemColors.Control;
+            this.PIDAssistField.CheckAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.PIDAssistField.Checked = true;
+            this.PIDAssistField.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.PIDAssistField.Location = new System.Drawing.Point(308, 380);
+            this.PIDAssistField.Name = "PIDAssistField";
+            this.PIDAssistField.Size = new System.Drawing.Size(77, 31);
+            this.PIDAssistField.TabIndex = 5;
+            this.PIDAssistField.Text = "Stability Assist";
+            this.PIDAssistField.UseVisualStyleBackColor = false;
+            // 
+            // SensorButton
+            // 
+            this.SensorButton.Enabled = false;
+            this.SensorButton.Location = new System.Drawing.Point(94, 347);
+            this.SensorButton.Name = "SensorButton";
+            this.SensorButton.Size = new System.Drawing.Size(75, 23);
+            this.SensorButton.TabIndex = 6;
+            this.SensorButton.Text = "Sensors";
+            this.SensorButton.UseVisualStyleBackColor = true;
+            this.SensorButton.Click += new System.EventHandler(this.SensorButton_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(40, -1);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(129, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Saved ROV Connections:";
+            // 
+            // ControllersListTable
+            // 
+            this.ControllersListTable.AutoScroll = true;
+            this.ControllersListTable.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.ControllersListTable.ColumnCount = 1;
+            this.ControllersListTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.ControllersListTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.ControllersListTable.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ControllersListTable.Location = new System.Drawing.Point(470, 15);
+            this.ControllersListTable.Name = "ControllersListTable";
+            this.ControllersListTable.RowCount = 1;
+            this.ControllersListTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 51F));
+            this.ControllersListTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49F));
+            this.ControllersListTable.Size = new System.Drawing.Size(240, 50);
+            this.ControllersListTable.TabIndex = 8;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(528, -1);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(93, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Saved Controllers:";
+            // 
+            // UseControllerButton
+            // 
+            this.UseControllerButton.AutoSize = true;
+            this.UseControllerButton.Enabled = false;
+            this.UseControllerButton.Location = new System.Drawing.Point(470, 376);
+            this.UseControllerButton.Name = "UseControllerButton";
+            this.UseControllerButton.Size = new System.Drawing.Size(53, 23);
+            this.UseControllerButton.TabIndex = 10;
+            this.UseControllerButton.Text = "Use";
+            this.UseControllerButton.UseVisualStyleBackColor = true;
+            // 
+            // AddControllerButton
+            // 
+            this.AddControllerButton.AutoSize = true;
+            this.AddControllerButton.Location = new System.Drawing.Point(568, 376);
+            this.AddControllerButton.Name = "AddControllerButton";
+            this.AddControllerButton.Size = new System.Drawing.Size(53, 23);
+            this.AddControllerButton.TabIndex = 11;
+            this.AddControllerButton.Text = "Add";
+            this.AddControllerButton.UseVisualStyleBackColor = true;
+            // 
+            // ConfigureControllerButton
+            // 
+            this.ConfigureControllerButton.AutoSize = true;
+            this.ConfigureControllerButton.Location = new System.Drawing.Point(648, 376);
+            this.ConfigureControllerButton.Name = "ConfigureControllerButton";
+            this.ConfigureControllerButton.Size = new System.Drawing.Size(62, 23);
+            this.ConfigureControllerButton.TabIndex = 12;
+            this.ConfigureControllerButton.Text = "Configure";
+            this.ConfigureControllerButton.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -104,6 +201,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(722, 411);
+            this.Controls.Add(this.ConfigureControllerButton);
+            this.Controls.Add(this.AddControllerButton);
+            this.Controls.Add(this.UseControllerButton);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.ControllersListTable);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.SensorButton);
+            this.Controls.Add(this.PIDAssistField);
             this.Controls.Add(this.ConfigureTrimButton);
             this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.ScanButton);
@@ -111,7 +216,6 @@
             this.Controls.Add(this.ConnectionsList);
             this.Name = "Main";
             this.Text = "CHS ROV 2K19";
-            this.Load += new System.EventHandler(this.Main_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -124,6 +228,14 @@
         private System.Windows.Forms.Button ScanButton;
         private System.Windows.Forms.Button ConnectButton;
         private System.Windows.Forms.Button ConfigureTrimButton;
+        private System.Windows.Forms.CheckBox PIDAssistField;
+        private System.Windows.Forms.Button SensorButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel ControllersListTable;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button UseControllerButton;
+        private System.Windows.Forms.Button AddControllerButton;
+        private System.Windows.Forms.Button ConfigureControllerButton;
     }
 }
 

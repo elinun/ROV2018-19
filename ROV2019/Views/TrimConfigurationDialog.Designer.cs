@@ -37,11 +37,15 @@
             this.RunUpButton = new System.Windows.Forms.Button();
             this.RunDownButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.trackBar2 = new System.Windows.Forms.TrackBar();
+            this.ForwardTrackBar = new System.Windows.Forms.TrackBar();
+            this.YawTrackBar = new System.Windows.Forms.TrackBar();
+            this.LeftDriftLabel = new System.Windows.Forms.Label();
+            this.RollTrackBar = new System.Windows.Forms.TrackBar();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.RunTimeField)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ForwardTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.YawTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RollTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
             // RunTimeField
@@ -137,29 +141,73 @@
             this.SaveButton.TabIndex = 8;
             this.SaveButton.Text = "Save";
             this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
-            // trackBar1
+            // ForwardTrackBar
             // 
-            this.trackBar1.Location = new System.Drawing.Point(12, 175);
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(182, 45);
-            this.trackBar1.TabIndex = 9;
+            this.ForwardTrackBar.AllowDrop = true;
+            this.ForwardTrackBar.LargeChange = 10;
+            this.ForwardTrackBar.Location = new System.Drawing.Point(12, 175);
+            this.ForwardTrackBar.Maximum = 100;
+            this.ForwardTrackBar.Minimum = -100;
+            this.ForwardTrackBar.Name = "ForwardTrackBar";
+            this.ForwardTrackBar.Size = new System.Drawing.Size(182, 45);
+            this.ForwardTrackBar.TabIndex = 9;
+            this.ForwardTrackBar.TickFrequency = 10;
             // 
-            // trackBar2
+            // YawTrackBar
             // 
-            this.trackBar2.Location = new System.Drawing.Point(77, 100);
-            this.trackBar2.Name = "trackBar2";
-            this.trackBar2.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.trackBar2.Size = new System.Drawing.Size(45, 182);
-            this.trackBar2.TabIndex = 10;
+            this.YawTrackBar.AllowDrop = true;
+            this.YawTrackBar.LargeChange = 10;
+            this.YawTrackBar.Location = new System.Drawing.Point(250, 175);
+            this.YawTrackBar.Maximum = 100;
+            this.YawTrackBar.Minimum = -100;
+            this.YawTrackBar.Name = "YawTrackBar";
+            this.YawTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.YawTrackBar.Size = new System.Drawing.Size(45, 182);
+            this.YawTrackBar.TabIndex = 10;
+            this.YawTrackBar.TickFrequency = 10;
+            // 
+            // LeftDriftLabel
+            // 
+            this.LeftDriftLabel.AutoSize = true;
+            this.LeftDriftLabel.Location = new System.Drawing.Point(43, 134);
+            this.LeftDriftLabel.Name = "LeftDriftLabel";
+            this.LeftDriftLabel.Size = new System.Drawing.Size(151, 13);
+            this.LeftDriftLabel.TabIndex = 12;
+            this.LeftDriftLabel.Text = "How much did it drift left/right?";
+            // 
+            // RollTrackBar
+            // 
+            this.RollTrackBar.AllowDrop = true;
+            this.RollTrackBar.LargeChange = 10;
+            this.RollTrackBar.Location = new System.Drawing.Point(330, 175);
+            this.RollTrackBar.Maximum = 100;
+            this.RollTrackBar.Minimum = -100;
+            this.RollTrackBar.Name = "RollTrackBar";
+            this.RollTrackBar.Size = new System.Drawing.Size(182, 45);
+            this.RollTrackBar.TabIndex = 13;
+            this.RollTrackBar.TickFrequency = 10;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(330, 374);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(101, 35);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "Manual Configuration";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // TrimConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(543, 421);
-            this.Controls.Add(this.trackBar2);
-            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.RollTrackBar);
+            this.Controls.Add(this.LeftDriftLabel);
+            this.Controls.Add(this.YawTrackBar);
+            this.Controls.Add(this.ForwardTrackBar);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.RunDownButton);
             this.Controls.Add(this.RunUpButton);
@@ -172,8 +220,9 @@
             this.Name = "TrimConfigurationDialog";
             this.Text = "TrimConfigurationDialog";
             ((System.ComponentModel.ISupportInitialize)(this.RunTimeField)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ForwardTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.YawTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RollTrackBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -190,7 +239,10 @@
         private System.Windows.Forms.Button RunUpButton;
         private System.Windows.Forms.Button RunDownButton;
         private System.Windows.Forms.Button SaveButton;
-        private System.Windows.Forms.TrackBar trackBar1;
-        private System.Windows.Forms.TrackBar trackBar2;
+        private System.Windows.Forms.TrackBar ForwardTrackBar;
+        private System.Windows.Forms.TrackBar YawTrackBar;
+        private System.Windows.Forms.Label LeftDriftLabel;
+        private System.Windows.Forms.TrackBar RollTrackBar;
+        private System.Windows.Forms.Button button1;
     }
 }
