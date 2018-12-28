@@ -10,7 +10,11 @@ namespace ROV2019.ControllerConfigurations
     public abstract class ControllerConfiguration
     {
         public abstract ConfiguredPollData Poll();
-        public abstract ControllerConfiguration(Controller controller);
+        //not sure if this will be necessary.
+        public ControllerConfiguration(Controller controller)
+        {
+
+        }
     }
 
     public class Tank : ControllerConfiguration
@@ -35,9 +39,18 @@ namespace ROV2019.ControllerConfigurations
         public override ConfiguredPollData Poll()
         {
             //TODO: Poll controller, and interpret that into the vectors, etc.
+            controller.Poll();
+
+            //map ROV movements to controlls on controller
+            int verticalSpeed = (controller.RotationX > 0 ? controller.RotationX : controller.RotationY);
+            (int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed) mVectors = (
+            controller.X,
+            controller.Y, controller.Z, verticalSpeed, 0);
+
             ConfiguredPollData data = new ConfiguredPollData()
             {
-
+                Vectors = mVectors,
+                ServoSpeeds = new Dictionary<int, int>()
             };
             return data;
         }

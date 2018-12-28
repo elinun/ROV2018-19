@@ -13,17 +13,15 @@ namespace ROV2019.Presenters
     {
         ConnectionContext conn;
         ControllerConfiguration config;
-        Controller controller;
         Thread pollThread;
         int PollInterval;
         private bool isPolling;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, Controller control, int PollRate = 15)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 15)
         {
             conn = connection;
             config = configuration;
-            controller = control;
             PollInterval = PollRate;
         }
 
@@ -48,6 +46,7 @@ namespace ROV2019.Presenters
                 {
                     conn.MoveVectorWithTrim(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed, data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
                 }
+                Thread.Sleep(PollInterval);
             }
         }
 
