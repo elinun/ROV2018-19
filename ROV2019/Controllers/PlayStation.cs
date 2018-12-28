@@ -15,8 +15,8 @@ namespace ROV2019.Controllers
         {
             Joystick = new Joystick(input, guid);
             SlimDX.Result acquireSuccess = Joystick.Acquire();
-            if (acquireSuccess.IsFailure)
-                throw new Exception("Failed to Acquire PlayStation Controller.");
+            //if (acquireSuccess.IsFailure)
+                //throw new Exception("Failed to Acquire PlayStation Controller.");
         }
 
         public override void Poll()

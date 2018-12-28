@@ -10,6 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ROV2019.ControllerConfigurations;
+using SlimDX.DirectInput;
+using ROV2019.Controllers;
 
 namespace ROV2019
 {
@@ -19,14 +22,20 @@ namespace ROV2019
         ArduinoConnection selectedConnection = null;
         ConnectionContext openConnection = null;
 
+        ConnectionControllerMesher mesher;
+
+        ControllerManager ControllerManager;
+        ControllerInfo SelectedController = null;
+
         public Main()
         {
             InitializeComponent();
 
             connectionManager = new ConnectionManager();
+            ControllerManager = new ControllerManager();
 
             PopulateConnectionsList();
-            
+            PopulateControllersList();
         }
 
         private void PopulateConnectionsList()
@@ -36,7 +45,20 @@ namespace ROV2019
             foreach (ArduinoConnection con in connectionManager.SavedConnections)
             {
                 ConnectionListItem connectionItem = new ConnectionListItem(con, RemoveButton_Click, null, ConnectionSelected);
+                if (selectedConnection == con)
+                    connectionItem.ToggleSelected();
                 ConnectionsList.Controls.Add(connectionItem, 0, ConnectionsList.RowCount - 1);
+            }
+        }
+
+        private void PopulateControllersList()
+        {
+            ControllersListTable.Controls.Clear();
+
+            foreach(ControllerInfo info in ControllerManager.SavedControllers)
+            {
+                ControllerListItem listItem = new ControllerListItem(info, RemoveController, null, SelectController);
+                ControllersListTable.Controls.Add(listItem, 0, ControllersListTable.RowCount-1);
             }
         }
 
@@ -48,7 +70,34 @@ namespace ROV2019
             SensorButton.Enabled = enabled;
         }
 
-        //Click Handlers
+        #region Click Handlers
+
+        private void RemoveController(object sender, EventArgs e)
+        {
+            if (mesher == null || !mesher.IsMeshing)
+            {
+                ControllerInfo info = (ControllerInfo)((Button)sender).Tag;
+                ControllerManager.Remove(info);
+                PopulateControllersList();
+            }
+        }
+
+        private void SelectController(object sender, EventArgs e)
+        {
+            ControllerListItem listItem = (ControllerListItem)sender;
+            if(listItem.Selected && mesher == null)
+            {
+                //un-select
+                UseControllerButton.Enabled = listItem.ToggleSelected();
+                SelectedController = null;
+            }
+            else if(SelectedController == null)
+            {
+                //select
+                SelectedController = (ControllerInfo)listItem.Tag;
+                UseControllerButton.Enabled = listItem.ToggleSelected();
+            }
+        }
 
         private void ConnectionSelected(object sender, EventArgs e)
         {
@@ -57,8 +106,7 @@ namespace ROV2019
             {
                 //unselecting
                 this.selectedConnection = null;
-                SetConnectionSpecificButtonsEnabled(false);
-                selectedConn.ToggleSelected();
+                SetConnectionSpecificButtonsEnabled(selectedConn.ToggleSelected());
             }
             else
             {
@@ -76,13 +124,14 @@ namespace ROV2019
 
         private void RemoveButton_Click(object sender, EventArgs e)
         {
-            if (openConnection != null && openConnection.isConnected())
-                openConnection.Close();
-            openConnection = null;
-            selectedConnection = null;
-            SetConnectionSpecificButtonsEnabled(false);
-            connectionManager.Remove((ArduinoConnection)((Button)sender).Tag);
-            PopulateConnectionsList();
+            ArduinoConnection conn = (ArduinoConnection)((Button)sender).Tag;
+            if (openConnection == null || openConnection.connection != conn)
+            {
+                connectionManager.Remove(conn);
+                if (conn == selectedConnection)
+                    selectedConnection = null;
+                PopulateConnectionsList();
+            }
         }
 
         private void manualAddButton_Click(object sender, EventArgs e)
@@ -153,5 +202,40 @@ namespace ROV2019
         {
             //TODO: Open Dialog with senor data.
         }
+
+        private void AddControllerButton_Click(object sender, EventArgs e)
+        {
+            //TODO: Show add controller dialog.
+            ControllerInfo newController = new ControllerInfo()
+            {
+                FriendlyName = "Testing",
+                ControllerClass = "PlayStation",
+                ConfigurationClass = typeof(Arcade).Name,
+                Type = ControllerType.SlimDX
+            };
+            ControllerManager.Add(newController);
+            PopulateControllersList();
+        }
+
+        private void UseControllerButton_Click(object sender, EventArgs e)
+        {
+            if(openConnection != null && openConnection.isConnected())
+            {
+                //start the mesh
+
+                //read what type of configuration to use from saved properties.
+                /*DirectInput directInput = new DirectInput();
+                var device = directInput.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault();
+                Controller c = new PlayStation(directInput, device.InstanceGuid);*/
+                Controller c = ControllerManager.GetController(SelectedController);
+
+                ControllerConfiguration config = (ControllerConfiguration)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.ControllerConfigurations."+SelectedController.ConfigurationClass, true, System.Reflection.BindingFlags.CreateInstance, null, new object[] { c }, null, null);
+                mesher = new ConnectionControllerMesher(openConnection, config);
+                mesher.StartMesh();
+                UseControllerButton.Text = "Stop Using";
+            }
+        }
+
+        #endregion
     }
 }

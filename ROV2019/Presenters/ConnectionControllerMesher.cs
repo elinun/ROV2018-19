@@ -15,7 +15,7 @@ namespace ROV2019.Presenters
         ControllerConfiguration config;
         Thread pollThread;
         int PollInterval;
-        private bool isPolling;
+        public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
         public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 15)
@@ -27,14 +27,14 @@ namespace ROV2019.Presenters
 
         public void StartMesh()
         {
-            isPolling = true;
+            IsMeshing = true;
             pollThread = new Thread(Poll);
             pollThread.Start();
         }
 
         private void Poll()
         {
-            while(isPolling)
+            while(IsMeshing)
             {
                 ConfiguredPollData data = config.Poll();
                 if (IsUsingPID)
@@ -52,7 +52,7 @@ namespace ROV2019.Presenters
 
         public void StopMesh()
         {
-            isPolling = false;
+            IsMeshing = false;
             pollThread.Suspend();
             pollThread = null;
         }

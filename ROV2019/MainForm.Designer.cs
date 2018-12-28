@@ -142,6 +142,7 @@
             // ControllersListTable
             // 
             this.ControllersListTable.AutoScroll = true;
+            this.ControllersListTable.AutoSize = true;
             this.ControllersListTable.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ControllersListTable.ColumnCount = 1;
             this.ControllersListTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -174,6 +175,7 @@
             this.UseControllerButton.TabIndex = 10;
             this.UseControllerButton.Text = "Use";
             this.UseControllerButton.UseVisualStyleBackColor = true;
+            this.UseControllerButton.Click += new System.EventHandler(this.UseControllerButton_Click);
             // 
             // AddControllerButton
             // 
@@ -184,6 +186,7 @@
             this.AddControllerButton.TabIndex = 11;
             this.AddControllerButton.Text = "Add";
             this.AddControllerButton.UseVisualStyleBackColor = true;
+            this.AddControllerButton.Click += new System.EventHandler(this.AddControllerButton_Click);
             // 
             // ConfigureControllerButton
             // 
