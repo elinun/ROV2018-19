@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using ROV2019.ControllerConfigurations;
 using SlimDX.DirectInput;
 using ROV2019.Controllers;
+using System.Threading;
 
 namespace ROV2019
 {
@@ -36,6 +37,32 @@ namespace ROV2019
 
             PopulateConnectionsList();
             PopulateControllersList();
+
+            new Thread(UpdateControllerConnectedStatus).Start();
+        }
+
+        private void UpdateControllerConnectedStatus()
+        {
+            while (true)
+            {
+                Invoke(new MethodInvoker(delegate
+                {
+                    foreach (Control c in ControllersListTable.Controls)
+                    {
+                        ControllerInfo info = (ControllerInfo)c.Tag;
+                        if (!ControllerManager.IsControllerConnected(info))
+                        {
+                            c.BackColor = Color.Orange;
+                        }
+                        else
+                        {
+                            c.BackColor = Color.Transparent;
+                        }
+                    }
+
+                }));
+                Thread.Sleep(250);
+            }
         }
 
         private void PopulateConnectionsList()
@@ -55,10 +82,14 @@ namespace ROV2019
         {
             ControllersListTable.Controls.Clear();
 
-            foreach(ControllerInfo info in ControllerManager.SavedControllers)
+            foreach (ControllerInfo info in ControllerManager.SavedControllers)
             {
                 ControllerListItem listItem = new ControllerListItem(info, RemoveController, null, SelectController);
-                ControllersListTable.Controls.Add(listItem, 0, ControllersListTable.RowCount-1);
+                if (info == SelectedController)
+                    listItem.ToggleSelected();
+                if (!ControllerManager.IsControllerConnected(info))
+                    listItem.BackColor = Color.Orange;
+                ControllersListTable.Controls.Add(listItem, 0, ControllersListTable.RowCount - 1);
             }
         }
 
@@ -85,13 +116,13 @@ namespace ROV2019
         private void SelectController(object sender, EventArgs e)
         {
             ControllerListItem listItem = (ControllerListItem)sender;
-            if(listItem.Selected && mesher == null)
+            if (listItem.Selected && mesher == null)
             {
                 //un-select
                 UseControllerButton.Enabled = listItem.ToggleSelected();
                 SelectedController = null;
             }
-            else if(SelectedController == null)
+            else if (SelectedController == null)
             {
                 //select
                 SelectedController = (ControllerInfo)listItem.Tag;
@@ -143,7 +174,7 @@ namespace ROV2019
         private void ConnectButton_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            if(button.Text.Equals("Connect"))
+            if (button.Text.Equals("Connect"))
             {
                 this.openConnection = new ConnectionContext(this.selectedConnection);
                 if (openConnection.OpenConnection())
@@ -219,20 +250,26 @@ namespace ROV2019
 
         private void UseControllerButton_Click(object sender, EventArgs e)
         {
-            if(openConnection != null && openConnection.isConnected())
+            Button button = (Button)sender;
+            if (button.Text.Contains("Stop"))
             {
-                //start the mesh
 
-                //read what type of configuration to use from saved properties.
-                /*DirectInput directInput = new DirectInput();
-                var device = directInput.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault();
-                Controller c = new PlayStation(directInput, device.InstanceGuid);*/
-                Controller c = ControllerManager.GetController(SelectedController);
+                button.Text = "Use";
+            }
+            else
+            {
 
-                ControllerConfiguration config = (ControllerConfiguration)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.ControllerConfigurations."+SelectedController.ConfigurationClass, true, System.Reflection.BindingFlags.CreateInstance, null, new object[] { c }, null, null);
-                mesher = new ConnectionControllerMesher(openConnection, config);
-                mesher.StartMesh();
-                UseControllerButton.Text = "Stop Using";
+                if (openConnection != null && openConnection.isConnected() && ControllerManager.IsControllerConnected(SelectedController))
+                {
+                    //start the mesh
+
+                    //read what type of configuration to use from saved properties.
+                    ControllerConfiguration config = ControllerManager.GetConfiguration(SelectedController);
+                    mesher = new ConnectionControllerMesher(openConnection, config);
+                    mesher.StartMesh();
+                    UseControllerButton.Text = "Stop Using";
+
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using ROV2019.Models;
+﻿using ROV2019.ControllerConfigurations;
+using ROV2019.Models;
 using SlimDX.DirectInput;
 using System;
 using System.Collections.Generic;
@@ -25,15 +26,40 @@ namespace ROV2019.Presenters
             SavedControllers = Properties.Settings.Default.SavedControllers.SavedControllers;
         }
 
-        public Controller GetController(ControllerInfo info)
+        public bool IsControllerConnected(ControllerInfo info)
+        {
+            switch(info.Type)
+            {
+                case ControllerType.SlimDX:
+                    DirectInput input = new DirectInput();
+                    IList<DeviceInstance> devices = input.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly);
+                    return devices.Count > 0;
+                default:
+                    return false;
+            }
+        }
+
+        public ControllerConfiguration GetConfiguration(ControllerInfo info)
+        {
+            Controller c = GetController(info);
+            return (ControllerConfiguration)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.ControllerConfigurations." + info.ConfigurationClass, true, System.Reflection.BindingFlags.CreateInstance, null, new object[] { c }, null, null);
+        }
+
+        private Controller GetController(ControllerInfo info)
         {
             switch (info.Type)
             {
                 case ControllerType.SlimDX:
                     DirectInput directInput = new DirectInput();
-
-                    return (Controller)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.Controllers." + info.ControllerClass, true, System.Reflection.BindingFlags.CreateInstance, null, 
-                        new object[] { directInput, directInput.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault().InstanceGuid}, null, null);
+                    try
+                    {
+                        return (Controller)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.Controllers." + info.ControllerClass, true, System.Reflection.BindingFlags.CreateInstance, null,
+                            new object[] { directInput, directInput.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault().InstanceGuid }, null, null);
+                    }
+                    catch(Exception)
+                    {
+                        return null;
+                    }
                 default:
                     return null;
             }

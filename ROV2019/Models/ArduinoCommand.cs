@@ -14,16 +14,19 @@ namespace ROV2019.Models
 
         public void AddParameter(string value)
         {
-
+            Parameters.Add(GetBytes(value));
         }
 
         public void AddParameter(int value)
         {
+            /*
             byte[] intBytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(intBytes);
             byte[] result = intBytes;
             Parameters.Add(result);
+            */
+            Parameters.Add(GetBytes(value.ToString()));
         }
         public static byte[] GetBytes(string s)
         {
@@ -56,10 +59,11 @@ namespace ROV2019.Models
                 command = addAllBytes(command, bytes);
                 command = addAllBytes(command, GetBytes(","));
             }
-            if(Parameters.Count>0)
-                command.RemoveAt(command.Count - 1);
+            /*if(Parameters.Count>0)
+                command.RemoveAt(command.Count - 1);*/
             //add bytes to return
-            cmd = ":" + NumberOfReturnedBytes + "}";
+            //cmd = ":" + NumberOfReturnedBytes + "}";
+            cmd = "}";
             command = addAllBytes(command, GetBytes(cmd));
             return command.ToArray();
         }
