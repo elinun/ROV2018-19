@@ -5,6 +5,9 @@
 #include<PID_v1.h>
 #include <stdio.h>
 
+#define PASSWORD "password" //change this to actual password
+#define ROV_NAME "Innovocean X" //16 character max, please
+
 const int MPU_addr=0x68; 
 
 struct Command {
@@ -112,16 +115,17 @@ void loop() {
           
       }
     }
+    Authorized = false;
   }
   
 }
 
 void pickCommand(EthernetClient client, String name, std::vector<String> params)
 {
-  //Serial.println(name);
+  Serial.println(name);
   if(name == "authorize")
   {
-    if(params[0] == "Drugs")
+    if(params[0] == PASSWORD)
     {
       client.write(0x01);
       Authorized = true;
@@ -143,6 +147,15 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     client.print("X="); client.print(accel[0]);
     client.print(";Y="); client.print(accel[1]);
     client.print(";Z="); client.println(accel[2]);
+  }
+  else if(name == "GetName")
+  {
+    String rovName = ROV_NAME;
+    while(rovName.length()<16)
+    {
+      rovName += " ";
+    }
+    client.print(rovName);
   }
 }
 

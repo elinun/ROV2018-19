@@ -219,6 +219,7 @@
             this.Controls.Add(this.ConnectionsList);
             this.Name = "Main";
             this.Text = "CHS ROV 2K19";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

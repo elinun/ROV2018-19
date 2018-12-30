@@ -15,7 +15,7 @@ namespace ROV2019.Views
         public ConnectionListItem(ArduinoConnection con, EventHandler OnRemove, EventHandler OnTest, EventHandler OnSelect)
         {
             this.Tag = con;
-            Name = con.FriendlyName + con.Password + con.IpAddress;
+            Name = con.FriendlyName + con.IpAddress;
             this.Click += OnSelect;
             Cursor = Cursors.Hand;
             //Name Label

@@ -38,29 +38,34 @@ namespace ROV2019
             PopulateConnectionsList();
             PopulateControllersList();
 
-            new Thread(UpdateControllerConnectedStatus).Start();
+            Thread controllerCheckerThread = new Thread(UpdateControllerConnectedStatus);
+            controllerCheckerThread.IsBackground = true;
+            controllerCheckerThread.Start();
         }
 
         private void UpdateControllerConnectedStatus()
         {
             while (true)
             {
-                Invoke(new MethodInvoker(delegate
+                if (IsHandleCreated)
                 {
-                    foreach (Control c in ControllersListTable.Controls)
+                    Invoke(new MethodInvoker(delegate
                     {
-                        ControllerInfo info = (ControllerInfo)c.Tag;
-                        if (!ControllerManager.IsControllerConnected(info))
+                        foreach (Control c in ControllersListTable.Controls)
                         {
-                            c.BackColor = Color.Orange;
+                            ControllerInfo info = (ControllerInfo)c.Tag;
+                            if (!ControllerManager.IsControllerConnected(info))
+                            {
+                                c.BackColor = Color.Orange;
+                            }
+                            else
+                            {
+                                c.BackColor = Color.Transparent;
+                            }
                         }
-                        else
-                        {
-                            c.BackColor = Color.Transparent;
-                        }
-                    }
 
-                }));
+                    }));
+                }
                 Thread.Sleep(250);
             }
         }
@@ -99,6 +104,36 @@ namespace ROV2019
             ConnectButton.Enabled = enabled;
             ConfigureTrimButton.Enabled = enabled;
             SensorButton.Enabled = enabled;
+        }
+
+        private void setConnectionListItemDisplayConnected(bool connected)
+        {
+            ConnectionListItem listItem = (ConnectionListItem)ConnectionsList.Controls.Find(selectedConnection.FriendlyName + selectedConnection.IpAddress, true)[0];
+            if (connected)
+            {
+                listItem.BackColor = Color.Green;
+                listItem.Click -= ConnectionSelected;
+                listItem.Cursor = Cursors.Arrow;
+            }
+            else
+            {
+                listItem.BackColor = Color.Yellow;
+                listItem.Click += ConnectionSelected;
+                listItem.Cursor = Cursors.Hand;
+            }
+        }
+
+
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (mesher != null && mesher.IsMeshing)
+            {
+                mesher.StopMesh();
+            }
+            if(openConnection != null && openConnection.isConnected())
+            {
+                openConnection.Close();
+            }
         }
 
         #region Click Handlers
@@ -192,11 +227,9 @@ namespace ROV2019
                         if (userPassword.Equals(""))
                             return;
                     }
-                    //TODO: Refactor
+                    //TODO: Refactor maybe
                     button.Text = "Disconnect";
-                    ConnectionListItem listItem = (ConnectionListItem)ConnectionsList.Controls.Find(selectedConnection.FriendlyName + selectedConnection.Password + selectedConnection.IpAddress, false)[0];
-                    listItem.BackColor = Color.Green;
-                    listItem.Click -= ConnectionSelected;
+                    setConnectionListItemDisplayConnected(true);
                 }
                 else
                 {
@@ -208,9 +241,7 @@ namespace ROV2019
                 openConnection.Close();
                 button.Text = "Connect";
                 //TODO: Refactor
-                ConnectionListItem listItem = (ConnectionListItem)ConnectionsList.Controls.Find(selectedConnection.FriendlyName + selectedConnection.Password + selectedConnection.IpAddress, false)[0];
-                listItem.BackColor = Color.Yellow;
-                listItem.Click += ConnectionSelected;
+                setConnectionListItemDisplayConnected(false);
             }
         }
 
