@@ -1,6 +1,7 @@
 ﻿using ROV2019.Models;
 using System;
 using System.Net.Sockets;
+using System.Text;
 
 namespace ROV2019.Presenters
 {
@@ -53,6 +54,33 @@ namespace ROV2019.Presenters
                 return client.Connected;
             }
             return false;
+        }
+
+        public (int X, int Y, int Z) GetAccelerations()
+        {
+            if(isConnected())
+            {
+                ArduinoCommand cmd = new ArduinoCommand()
+                {
+                    Command = Command.GetAccelerations
+                };
+                byte[] toWrite = cmd.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                char c;
+                StringBuilder sb = new StringBuilder();
+                while((c=(char)stream.ReadByte()) != '}')
+                {
+                    if(c != '{')
+                        sb.Append(c);
+                }
+                string str = sb.ToString();
+                string[] vals = str.Split(';');
+                int X = int.Parse(vals[0].Substring(2));
+                int Y = int.Parse(vals[1].Substring(2));
+                int Z = int.Parse(vals[2].Substring(2));
+                return (X, Y, Z);
+            }
+            return (0,0,0);
         }
 
         public string GetName()

@@ -144,9 +144,10 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
   {
     int16_t accel[3];
     GetAccelerations(accel);
-    client.print("X="); client.print(accel[0]);
+    client.print("{X="); client.print(accel[0]);
     client.print(";Y="); client.print(accel[1]);
-    client.print(";Z="); client.println(accel[2]);
+    client.print(";Z="); client.print(accel[2]);
+    client.print("}");
   }
   else if(name == "GetName")
   {
