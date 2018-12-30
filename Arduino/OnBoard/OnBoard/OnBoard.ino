@@ -15,7 +15,7 @@ bool Authorized = false;
 
 //PID
 double Input, Output, Setpoint;
-PID rollPID(&Input, &Output, &Setpoint,2,2,1, DIRECT);
+PID rollPID(&Input, &Output, &Setpoint,1,3,1, DIRECT);
 
 //Thrusters Front Left, Front Right...
 Servo FL, FR, BL, BR, VL, VR;
@@ -42,14 +42,23 @@ void setup() {
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
+  delay(30);
+  /*
+   * Set Range to 8g*/
+  Wire.beginTransmission(MPU_addr);
+  Wire.write(0x1C);
+  Wire.write((byte)16);
+  Wire.endTransmission(true);
+  
   
   //Setup servos
 
   //Setup anything else
 
   //Setup PID
-  Setpoint = 127;
-  Input = 127;
+  Setpoint = 0;
+  Input = 1;
+  rollPID.SetOutputLimits(-255,255);
   rollPID.SetMode(AUTOMATIC);
   //Start Server
   server.begin();
@@ -109,7 +118,7 @@ void loop() {
 
 void pickCommand(EthernetClient client, String name, std::vector<String> params)
 {
-  Serial.println(name);
+  //Serial.println(name);
   if(name == "authorize")
   {
     if(params[0] == "Drugs")
@@ -157,7 +166,8 @@ void MoveWithPIDAssist(std::vector<String> params)
 {
   int16_t accel[3];
   GetAccelerations(accel);
-  Input = map(accel[1], -18000, 18000, 0, 255);
+  Input = map(accel[1], -4096, 4096, -255, 255);
+  
 
   int vectors[5];
   for(int i = 0; i<5;i++)
@@ -166,25 +176,15 @@ void MoveWithPIDAssist(std::vector<String> params)
     params[i].toCharArray(str, sizeof(str));
     vectors[i] = atoi(str);
   }
-  int negativeOrPositive;
-  if(Input<115)
-  {
-    negativeOrPositive = -1;
-    rollPID.SetControllerDirection(DIRECT);
-  }
-  else if(Input > 145)
-  {
-    negativeOrPositive = 1;
-    rollPID.SetControllerDirection(REVERSE);
-  }
 
   if(rollPID.Compute())
   {
-    Serial.print("Input = ");Serial.print(Input);
-    Serial.print(" | Output = "); Serial.println(Output);
+    //Serial.print("Raw = ");Serial.print(accel[1]);
+    //Serial.print("| Input = ");Serial.print(Input);
+    //Serial.print(" | Output = "); Serial.println(Output);
   }
-  VL.writeMicroseconds(1500+vectors[2]+((Output*negativeOrPositive)/2));
-  VR.writeMicroseconds(1500+vectors[2]+((Output*negativeOrPositive*-1)/2));
+  VL.writeMicroseconds(1500+vectors[2]+(Output/2));
+  VR.writeMicroseconds(1500+vectors[2]+(Output/-2));
 
   
 }
