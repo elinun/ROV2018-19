@@ -75,7 +75,7 @@ namespace ROV2019.Models
         public static readonly string SetThruster = "setThruster";
         public static readonly string AnalogRead = "analogRead";
         public static readonly string GetName = "GetName";
-        public static readonly string MoveWithPID = "moveWithPIDAssist";
+        public static readonly string VerticalStabilize = "VerticalStabilize";
         public static readonly string GetAccelerations = "GetAccelerations";
     }
 

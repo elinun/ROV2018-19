@@ -10,10 +10,6 @@
 
 const int MPU_addr=0x68; 
 
-struct Command {
-  char name[];
-  char* parameters[];
-};
 bool Authorized = false;
 
 //PID
@@ -45,7 +41,6 @@ void setup() {
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
-  delay(30);
   /*
    * Set Range to 8g*/
   Wire.beginTransmission(MPU_addr);
@@ -67,7 +62,9 @@ void setup() {
   server.begin();
   //Set-up thrusters
 
-  
+
+  //Send Stop signal
+  Stop();  
 }
 
 void loop() {
@@ -80,6 +77,7 @@ void loop() {
     {
       if(client.available())
       {
+        //parse command from client stream
           char c;
           bool foundCommandName = false;
           String commandName = "";
@@ -110,11 +108,12 @@ void loop() {
             }
             
           }
-
+          //run command
           pickCommand(client, commandName, parameters);
           
       }
     }
+    Stop();
     Authorized = false;
   }
   
@@ -136,17 +135,29 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       Authorized = false;
     }
   }
-  else if(name == "moveWithPIDAssist" && Authorized)
+  else if(name == "VerticalStabilize" && Authorized)
   {
-    MoveWithPIDAssist(params);
+    int vectors[2];
+    for(int i = 0; i<2;i++)
+    {
+      char str[params[i].length()];
+      params[i].toCharArray(str, sizeof(str));
+      vectors[i] = atoi(str);
+    }
+    MoveWithPIDAssist(vectors);
   }
   else if(name == "GetAccelerations")
   {
-    int16_t accel[3];
+    int16_t accel[7];
     GetAccelerations(accel);
     client.print("{X="); client.print(accel[0]);
     client.print(";Y="); client.print(accel[1]);
     client.print(";Z="); client.print(accel[2]);
+    //Gyros
+    client.print(";="); client.print(accel[3]);
+    client.print(";="); client.print(accel[4]);
+    client.print(";="); client.print(accel[5]);
+    client.print(";="); client.print(accel[6]);
     client.print("}");
   }
   else if(name == "GetName")
@@ -158,8 +169,19 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     }
     client.print(rovName);
   }
+  else if(name == "SetThruster" && Authorized)
+  {
+    
+  }
 }
 
+void Stop()
+{
+  for(int i = 0; i<6; i++)
+  {
+    SetThruster(i, 1500);
+  }
+}
 
 void printIPAddress(){
   Serial.print("My IP address: ");
@@ -173,34 +195,47 @@ void printIPAddress(){
 }
 void SetThruster(int thruster, int msValue)
 {
-  
+  switch(thruster)
+  {
+    case 0:
+      FL.writeMicroseconds(msValue);
+      break;
+    case 1:
+      FR.writeMicroseconds(msValue);
+      break;
+    case 2:
+      BL.writeMicroseconds(msValue);
+      break;
+    case 3:
+      BR.writeMicroseconds(msValue);
+      break;
+    case 4:
+      VL.writeMicroseconds(msValue);
+      break;
+    case 5:
+      VR.writeMicroseconds(msValue);
+      break;
+  }
 }
 
-void MoveWithPIDAssist(std::vector<String> params)
+void VerticalStabilize(int vectors[])
 {
-  int16_t accel[3];
+  int16_t accel[7];
   GetAccelerations(accel);
   Input = map(accel[1], -4096, 4096, -255, 255);
-  
-
-  int vectors[5];
-  for(int i = 0; i<5;i++)
+  if(abs(vecotrs[1])<256)
   {
-    char str[params[i].length()];
-    params[i].toCharArray(str, sizeof(str));
-    vectors[i] = atoi(str);
+    Setpoint = vectors[1];
   }
-
   if(rollPID.Compute())
   {
     //Serial.print("Raw = ");Serial.print(accel[1]);
     //Serial.print("| Input = ");Serial.print(Input);
     //Serial.print(" | Output = "); Serial.println(Output);
   }
-  VL.writeMicroseconds(1500+vectors[2]+(Output/2));
-  VR.writeMicroseconds(1500+vectors[2]+(Output/-2));
+  VL.writeMicroseconds(1500+vectors[0]+(Output/2));
+  VR.writeMicroseconds(1500+vectors[0]+(Output/-2));
 
-  
 }
 
 void GetAccelerations(int16_t values[])
@@ -208,9 +243,13 @@ void GetAccelerations(int16_t values[])
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr,6,true);  // request a total of 14 registers
-  values[0] =Wire.read()<<8|Wire.read();  // X 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
-  values[1] =Wire.read()<<8|Wire.read();  // Y 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  values[2] =Wire.read()<<8|Wire.read();  // Z 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  Wire.requestFrom(MPU_addr,14,true);  // request a total of 14 registers
+  values[0]=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
+  values[1]=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  values[2]=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  values[3]=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  values[4]=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  values[5]=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+  values[6]=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 }
 

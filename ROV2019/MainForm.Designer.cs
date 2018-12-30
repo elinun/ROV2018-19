@@ -114,10 +114,11 @@
             this.PIDAssistField.CheckState = System.Windows.Forms.CheckState.Checked;
             this.PIDAssistField.Location = new System.Drawing.Point(308, 380);
             this.PIDAssistField.Name = "PIDAssistField";
-            this.PIDAssistField.Size = new System.Drawing.Size(77, 31);
+            this.PIDAssistField.Size = new System.Drawing.Size(91, 31);
             this.PIDAssistField.TabIndex = 5;
-            this.PIDAssistField.Text = "Stability Assist";
+            this.PIDAssistField.Text = "Vertical Stabilizer";
             this.PIDAssistField.UseVisualStyleBackColor = false;
+            this.PIDAssistField.CheckedChanged += new System.EventHandler(this.PIDAssistField_CheckedChanged);
             // 
             // SensorButton
             // 

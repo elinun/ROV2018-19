@@ -39,12 +39,14 @@ namespace ROV2019.Presenters
                 ConfiguredPollData data = config.Poll();
                 if (IsUsingPID)
                 {
-                    conn.MoveVectorWithPIDAssist(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed, data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
+                    //Is Using PID has turned into VerticalStabilize
+                    conn.VerticalStabilize(data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
+                    conn.MoveVectors(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed);
                     //add servo code later
                 }
                 else
                 {
-                    conn.MoveVectorWithTrim(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed, data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
+                    conn.MoveVectors(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed, data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
                 }
                 Thread.Sleep(PollInterval);
             }
@@ -53,7 +55,7 @@ namespace ROV2019.Presenters
         public void StopMesh()
         {
             IsMeshing = false;
-            pollThread.Suspend();
+            pollThread.Abort() ;
             pollThread = null;
         }
     }

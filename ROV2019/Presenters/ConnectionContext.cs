@@ -121,22 +121,24 @@ namespace ROV2019.Presenters
             return false;
         }
 
-        public void MoveVectorWithTrim(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
+        public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
         {
-
+            //calculate the power to send to each thruster.
         }
 
-        public bool MoveVectorWithPIDAssist(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
+        public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed)
+        {
+            //calculate the power to send to each thruster.
+        }
+
+        public bool VerticalStabilize(int verticalSpeed, int rollSpeed)
         {
             ArduinoCommand command = new ArduinoCommand()
             {
-                Command = Command.MoveWithPID,
+                Command = Command.VerticalStabilize,
                 NumberOfReturnedBytes = 0
             };
-            command.AddParameter(lateralSpeed);
-            command.AddParameter(forwardSpeed);
             command.AddParameter(verticalSpeed);
-            command.AddParameter(rotationalSpeed);
             command.AddParameter(rollSpeed);
             if (isConnected())
             {

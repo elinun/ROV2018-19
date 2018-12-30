@@ -136,7 +136,16 @@ namespace ROV2019
             }
         }
 
+
         #region Click Handlers
+
+        private void PIDAssistField_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mesher != null)
+            {
+                mesher.IsUsingPID = ((CheckBox)sender).Checked;
+            }
+        }
 
         private void RemoveController(object sender, EventArgs e)
         {
@@ -306,5 +315,6 @@ namespace ROV2019
 
         #endregion
 
+        
     }
 }
