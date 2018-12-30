@@ -144,7 +144,7 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       params[i].toCharArray(str, sizeof(str));
       vectors[i] = atoi(str);
     }
-    MoveWithPIDAssist(vectors);
+    VerticalStabilize(vectors);
   }
   else if(name == "GetAccelerations")
   {
@@ -154,10 +154,10 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     client.print(";Y="); client.print(accel[1]);
     client.print(";Z="); client.print(accel[2]);
     //Gyros
-    client.print(";="); client.print(accel[3]);
-    client.print(";="); client.print(accel[4]);
-    client.print(";="); client.print(accel[5]);
-    client.print(";="); client.print(accel[6]);
+    client.print(";T="); client.print(accel[3]);
+    client.print(";A="); client.print(accel[4]);
+    client.print(";B="); client.print(accel[5]);
+    client.print(";C="); client.print(accel[6]);
     client.print("}");
   }
   else if(name == "GetName")
@@ -223,15 +223,15 @@ void VerticalStabilize(int vectors[])
   int16_t accel[7];
   GetAccelerations(accel);
   Input = map(accel[1], -4096, 4096, -255, 255);
-  if(abs(vecotrs[1])<256)
+  if(abs(vectors[1])<256)
   {
     Setpoint = vectors[1];
   }
   if(rollPID.Compute())
   {
-    //Serial.print("Raw = ");Serial.print(accel[1]);
-    //Serial.print("| Input = ");Serial.print(Input);
-    //Serial.print(" | Output = "); Serial.println(Output);
+    Serial.print("Raw = ");Serial.print(accel[1]);
+    Serial.print("| Input = ");Serial.print(Input);
+    Serial.print(" | Output = "); Serial.println(Output);
   }
   VL.writeMicroseconds(1500+vectors[0]+(Output/2));
   VR.writeMicroseconds(1500+vectors[0]+(Output/-2));
@@ -247,7 +247,7 @@ void GetAccelerations(int16_t values[])
   values[0]=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
   values[1]=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   values[2]=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  values[3]=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  values[3]=(Wire.read()<<8|Wire.read())/340.00+36.53;  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
   values[4]=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
   values[5]=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
   values[6]=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
