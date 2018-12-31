@@ -295,6 +295,10 @@ namespace ROV2019
             {
 
                 button.Text = "Use";
+                if(mesher != null)
+                {
+                    mesher.StopMesh();
+                }
             }
             else
             {

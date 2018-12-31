@@ -39,7 +39,7 @@ namespace ROV2019.Presenters
                 }
 
                 stream = client.GetStream();
-                stream.ReadTimeout = timeout;
+                //stream.ReadTimeout = timeout;
                 return true;
             }
             catch (Exception)
@@ -92,16 +92,23 @@ namespace ROV2019.Presenters
         {
             if(isConnected())
             {
-                ArduinoCommand command = new ArduinoCommand()
+                try
                 {
-                    Command = Command.GetName,
-                    NumberOfReturnedBytes = 16
-                };
-                byte[] toWrite = command.GetCommandBytes();
-                stream.Write(toWrite, 0, toWrite.Length);
-                byte[] toRead = new byte[command.NumberOfReturnedBytes];
-                stream.Read(toRead, 0, toRead.Length);
-                return ArduinoCommand.GetString(toRead);
+                    ArduinoCommand command = new ArduinoCommand()
+                    {
+                        Command = Command.GetName,
+                        NumberOfReturnedBytes = 16
+                    };
+                    byte[] toWrite = command.GetCommandBytes();
+                    stream.Write(toWrite, 0, toWrite.Length);
+                    byte[] toRead = new byte[command.NumberOfReturnedBytes];
+                    stream.Read(toRead, 0, toRead.Length);
+                    return ArduinoCommand.GetString(toRead);
+                }
+                catch(Exception)
+                {
+                    return "Failed To Get Name";
+                }
             }
             return "Failed to Get Name";
         }

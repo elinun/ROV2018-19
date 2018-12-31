@@ -23,12 +23,13 @@ namespace ROV2019.Controllers
         {
             JoystickState state = Joystick.GetCurrentState();
             //Straight forward for PS Controllers
-            X = state.X;
-            Y = state.Y;
-            Z = state.Z;
-            RotationX = state.RotationX;
-            RotationY = state.RotationY;
-            RotationZ = state.RotationZ;
+            //Just convert to -400 to 400 scale.
+            X = (state.X/82)-400;
+            Y = (state.Y/82)-400;
+            Z = (state.Z/82)-400;
+            RotationX = (state.RotationX / 163);
+            RotationY = (state.RotationY / 163);
+            RotationZ = (state.RotationZ / 82)-400;
             PointOfViewControllers = state.GetPointOfViewControllers();
             Buttons = state.GetButtons();
                         

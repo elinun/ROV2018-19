@@ -33,20 +33,38 @@ namespace ROV2019.ControllerConfigurations
     public class Arcade : ControllerConfiguration
     {
         Controller controller;
+        bool canVerticalMove = true;
+        bool previousUp = false;
+        bool previousDown = false;
+        int rollSpeed = 0;
         public Arcade(Controller c) : base(c)
         {
             controller = c;
         }
         public override ConfiguredPollData Poll()
         {
-            //TODO: Poll controller, and interpret that into the vectors, etc.
+            //Poll controller, and interpret that into the vectors, etc.
             controller.Poll();
 
             //map ROV movements to controlls on controller
-            int verticalSpeed = (controller.RotationX > 0 ? controller.RotationX : controller.RotationY);
+
+            //try to prevent swapping directions on the thrusters,
+            
+            int verticalSpeed = 0;
+            if(canVerticalMove)
+            {
+                verticalSpeed = (controller.RotationX > 0 ? -controller.RotationX : controller.RotationY);
+            }
+            canVerticalMove = !(previousUp && previousDown);
+            previousDown = controller.Buttons[6];
+            previousUp = controller.Buttons[7];
+
+            rollSpeed -= (controller.Buttons[4] && rollSpeed > -250 ? 1 : 0);
+            rollSpeed += (controller.Buttons[5]  && rollSpeed < 250? 1 : 0);
+
             (int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed) mVectors = (
             controller.X,
-            controller.Y, controller.Z, verticalSpeed, 0);
+            controller.Y, controller.Z, verticalSpeed, rollSpeed);
 
             ConfiguredPollData data = new ConfiguredPollData()
             {

@@ -72,7 +72,7 @@ namespace ROV2019.Models
     public class Command
     {
         public static readonly string Authorize = "authorize";
-        public static readonly string SetThruster = "setThruster";
+        public static readonly string SetThruster = "SetThruster";
         public static readonly string AnalogRead = "analogRead";
         public static readonly string GetName = "GetName";
         public static readonly string VerticalStabilize = "VerticalStabilize";
