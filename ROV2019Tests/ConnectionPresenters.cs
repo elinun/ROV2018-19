@@ -15,18 +15,24 @@ namespace ROV2019Tests
     {
 
         [TestMethod]
+        public void VectorCalculation()
+        {
+           // ConnectionContext.MoveVectors(400, -400, 0);
+        }
+
+        /*[TestMethod]
         public void ConnectionManager_Scan()
         {
             ConnectionManager manager = new ConnectionManager();
             int previousProgress = 0;
-            List<ArduinoConnection> results = manager.Scan(new Progress<int>(progress =>
+            List<ArduinoConnection> results = manager.Scan(new Progress<(ArduinoConnection, int)>(progress =>
             {
                 Assert.IsTrue(progress >= previousProgress);
                 previousProgress = progress;
             })).Result;
             Assert.AreEqual(results.Count, 1);
             Debug.WriteLine(results[0].IpAddress);
-        }
+        }*/
 
         [TestMethod]
         public void RunThruster()
@@ -38,7 +44,7 @@ namespace ROV2019Tests
             };
             ConnectionContext conn = new ConnectionContext(connProperties);
             conn.OpenConnection();
-            conn.SetThruster(1, 1500);
+            conn.SetThruster(Thrusters.FrontLeft, 1500);
         }
     }
 }

@@ -39,6 +39,7 @@ namespace ROV2019.Presenters
                 }
 
                 stream = client.GetStream();
+                stream.ReadTimeout = timeout;
                 return true;
             }
             catch (Exception)
@@ -56,7 +57,7 @@ namespace ROV2019.Presenters
             return false;
         }
 
-        public (int X, int Y, int Z) GetAccelerations()
+        public (int AcX, int AcY, int AcZ, int Temp, int GyX, int GyY, int GyZ) GetAccelerations()
         {
             if(isConnected())
             {
@@ -78,9 +79,13 @@ namespace ROV2019.Presenters
                 int X = int.Parse(vals[0].Substring(2));
                 int Y = int.Parse(vals[1].Substring(2));
                 int Z = int.Parse(vals[2].Substring(2));
-                return (X, Y, Z);
+                int temp = int.Parse(vals[3].Substring(2));
+                int GyX = int.Parse(vals[4].Substring(2));
+                int GyY = int.Parse(vals[5].Substring(2));
+                int GyZ = int.Parse(vals[6].Substring(2));
+                return (X, Y, Z, temp, GyX, GyY, GyZ);
             }
-            return (0,0,0);
+            return (0,0,0,0,0,0,0);
         }
 
         public string GetName()
@@ -116,7 +121,7 @@ namespace ROV2019.Presenters
                 stream.Write(toWrite, 0, toWrite.Length);
                 byte[] toRead = new byte[1];
                 stream.Read(toRead, 0, toRead.Length);
-                return (toRead[0] == 0x01 ? true : false);
+                return (toRead[0] == 0x01);
             }
             return false;
         }
@@ -124,11 +129,93 @@ namespace ROV2019.Presenters
         public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
         {
             //calculate the power to send to each thruster.
+            int leftPower = 1500 + verticalSpeed;
+            int rightPower = 1500 + verticalSpeed;
+
+            leftPower += rollSpeed;
+            rightPower -= rollSpeed;
+
+            //TODO: Add trim
+
+            leftPower = (leftPower > 1500 ? Math.Min(leftPower, 1900) : Math.Max(leftPower, 1100));
+            rightPower = (rightPower > 1500 ? Math.Min(rightPower, 1900) : Math.Max(rightPower, 1100));
+
+            SetThruster(Thrusters.VerticalLeft, leftPower);
+            SetThruster(Thrusters.VerticalRight, rightPower);
+            MoveVectors(forwardSpeed, lateralSpeed, rotationalSpeed);
         }
 
         public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed)
         {
+            /*The thrusters do not produce the same amount of thrust 
+             *when they go forward as when they go backwards. This means that
+             * when we move side to side we have to slow down the forward
+             * thrusters. The variable below is how much to slow it down.
+             * I currently have it set according to bluerobotic's documentation.
+             * Max Backwards thrust/Max Forward thrust
+             */
+            double CorrectionFactor = 0.78846153846;
             //calculate the power to send to each thruster.
+            int FLPwr = 1500;
+            int FRPwr = 1500;
+            int BLPwr = 1500;
+            int BRPwr = 1500;
+
+            //forward vector
+            FLPwr += forwardSpeed;
+            FRPwr += forwardSpeed;
+            BLPwr += forwardSpeed;
+            BRPwr += forwardSpeed;
+
+            //lateral Vector
+            if(lateralSpeed>0)
+            {
+                //right
+                FLPwr += (int)(lateralSpeed * CorrectionFactor);
+                FRPwr -= lateralSpeed;
+                BLPwr -= lateralSpeed;
+                BRPwr += (int)(lateralSpeed * CorrectionFactor);
+            }
+            else if(lateralSpeed < 0)
+            {
+                //left
+                //remember, adding a negative
+                FLPwr += lateralSpeed;
+                FRPwr -= (int)(lateralSpeed * CorrectionFactor);
+                BLPwr -= (int)(lateralSpeed * CorrectionFactor);
+                BRPwr += lateralSpeed;
+            }
+
+            //rotation
+            if(rotationalSpeed>0)
+            {
+                //clockwise
+                FLPwr += (int)(lateralSpeed * CorrectionFactor);
+                FRPwr -= lateralSpeed;
+                BLPwr += (int)(lateralSpeed * CorrectionFactor);
+                BRPwr -= lateralSpeed;
+            }
+            else if(rotationalSpeed<0)
+            {
+                //counter-clockwise, or anti-clockwise if ur British
+                FLPwr -= lateralSpeed;
+                FRPwr += (int)(lateralSpeed * CorrectionFactor);
+                BLPwr -= lateralSpeed;
+                BRPwr += (int)(lateralSpeed * CorrectionFactor);
+            }
+
+            //TODO: Add trim.
+
+            FLPwr = (FLPwr > 1500 ? Math.Min(FLPwr, 1900) : Math.Max(FLPwr, 1100));
+            FRPwr = (FRPwr > 1500 ? Math.Min(FRPwr, 1900) : Math.Max(FRPwr, 1100));
+            BLPwr = (BLPwr > 1500 ? Math.Min(BLPwr, 1900) : Math.Max(BLPwr, 1100));
+            BRPwr = (BRPwr > 1500 ? Math.Min(BRPwr, 1900) : Math.Max(BRPwr, 1100));
+
+            //send commands
+            SetThruster(Thrusters.FrontLeft, FLPwr);
+            SetThruster(Thrusters.FrontRight, FRPwr);
+            SetThruster(Thrusters.BackLeft, BLPwr);
+            SetThruster(Thrusters.BackRight, BRPwr);
         }
 
         public bool VerticalStabilize(int verticalSpeed, int rollSpeed)
