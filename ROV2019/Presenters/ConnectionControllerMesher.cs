@@ -18,7 +18,7 @@ namespace ROV2019.Presenters
         public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 15)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 1000)
         {
             conn = connection;
             config = configuration;
@@ -37,16 +37,23 @@ namespace ROV2019.Presenters
             while(IsMeshing)
             {
                 ConfiguredPollData data = config.Poll();
+                int VL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.VerticalLeft).Value;
+                int VR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.VerticalRight).Value;
+                int FL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.FrontLeft).Value;
+                int FR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.FrontRight).Value;
+                int BL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.BackLeft).Value;
+                int BR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.BackRight).Value;
+
                 if (IsUsingPID)
                 {
                     //Is Using PID has turned into VerticalStabilize
-                    conn.VerticalStabilize(data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
-                    conn.MoveVectors(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed);
+                    conn.VerticalStabilize(VL, VR);
+                    conn.MoveAndAddTrim(FL, FR, BL, BR);
                     //add servo code later
                 }
                 else
                 {
-                    conn.MoveVectors(data.Vectors.forwardSpeed, data.Vectors.lateralSpeed, data.Vectors.rotationalSpeed, data.Vectors.verticalSpeed, data.Vectors.rollSpeed);
+                    conn.MoveAndAddTrim(VL, VR, FL, FR, BR, BL);
                 }
                 Thread.Sleep(PollInterval);
             }

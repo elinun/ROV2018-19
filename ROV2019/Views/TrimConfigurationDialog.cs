@@ -24,13 +24,32 @@ namespace ROV2019.Views
 
             connectionManager = manager;
             connectionProperties = connection;
-            ShowDialog();
+
+            //populate sliders
+            ForwardTrackBar.Value = connection.Trim.LeftToRightCorrection;
+            YawTrackBar.Value = connection.Trim.FrontToBackCorrection;
+            RollTrackBar.Value = connection.Trim.RollCorrection;
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            
+            connectionManager.Save(connectionProperties);
             Close();
+        }
+
+        private void ForwardTrackBar_Scroll(object sender, EventArgs e)
+        {
+            connectionProperties.Trim.LeftToRightCorrection = ForwardTrackBar.Value;
+        }
+
+        private void YawTrackBar_Scroll(object sender, EventArgs e)
+        {
+            connectionProperties.Trim.FrontToBackCorrection = YawTrackBar.Value;
+        }
+
+        private void RollTrackBar_Scroll(object sender, EventArgs e)
+        {
+            connectionProperties.Trim.RollCorrection = RollTrackBar.Value;
         }
     }
 }

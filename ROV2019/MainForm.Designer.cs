@@ -1,4 +1,6 @@
-﻿namespace ROV2019
+﻿using ROV2019.Views;
+
+namespace ROV2019
 {
     partial class Main
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ConnectionsList = new System.Windows.Forms.TableLayoutPanel();
             this.manualAddButton = new System.Windows.Forms.Button();
             this.ScanButton = new System.Windows.Forms.Button();
@@ -41,6 +44,14 @@
             this.UseControllerButton = new System.Windows.Forms.Button();
             this.AddControllerButton = new System.Windows.Forms.Button();
             this.ConfigureControllerButton = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.missionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.TimerLabel = new System.Windows.Forms.Label();
+            this.StartButton = new System.Windows.Forms.Button();
+            this.ResetButton = new System.Windows.Forms.Button();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ConnectionsList
@@ -51,7 +62,7 @@
             this.ConnectionsList.ColumnCount = 1;
             this.ConnectionsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.ConnectionsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.ConnectionsList.Location = new System.Drawing.Point(12, 15);
+            this.ConnectionsList.Location = new System.Drawing.Point(12, 49);
             this.ConnectionsList.Name = "ConnectionsList";
             this.ConnectionsList.RowCount = 1;
             this.ConnectionsList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -134,7 +145,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, -1);
+            this.label1.Location = new System.Drawing.Point(40, 33);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(129, 13);
             this.label1.TabIndex = 7;
@@ -149,7 +160,7 @@
             this.ControllersListTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.ControllersListTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.ControllersListTable.Cursor = System.Windows.Forms.Cursors.Default;
-            this.ControllersListTable.Location = new System.Drawing.Point(470, 15);
+            this.ControllersListTable.Location = new System.Drawing.Point(470, 49);
             this.ControllersListTable.Name = "ControllersListTable";
             this.ControllersListTable.RowCount = 1;
             this.ControllersListTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 51F));
@@ -160,7 +171,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(528, -1);
+            this.label2.Location = new System.Drawing.Point(528, 33);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 13);
             this.label2.TabIndex = 9;
@@ -199,12 +210,71 @@
             this.ConfigureControllerButton.Text = "Configure";
             this.ConfigureControllerButton.UseVisualStyleBackColor = true;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripTextBox1,
+            this.missionsToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(722, 24);
+            this.menuStrip1.TabIndex = 13;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.Size = new System.Drawing.Size(61, 20);
+            this.toolStripTextBox1.Text = "Settings";
+            // 
+            // missionsToolStripMenuItem
+            // 
+            this.missionsToolStripMenuItem.Name = "missionsToolStripMenuItem";
+            this.missionsToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+            this.missionsToolStripMenuItem.Text = "Missions";
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // TimerLabel
+            // 
+            this.TimerLabel.AutoSize = true;
+            this.TimerLabel.Location = new System.Drawing.Point(341, 49);
+            this.TimerLabel.Name = "TimerLabel";
+            this.TimerLabel.Size = new System.Drawing.Size(34, 13);
+            this.TimerLabel.TabIndex = 14;
+            this.TimerLabel.Text = "00:00";
+            // 
+            // StartButton
+            // 
+            this.StartButton.Location = new System.Drawing.Point(258, 76);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(75, 23);
+            this.StartButton.TabIndex = 15;
+            this.StartButton.Text = "Start";
+            this.StartButton.UseVisualStyleBackColor = true;
+            this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
+            // 
+            // ResetButton
+            // 
+            this.ResetButton.Location = new System.Drawing.Point(389, 76);
+            this.ResetButton.Name = "ResetButton";
+            this.ResetButton.Size = new System.Drawing.Size(75, 23);
+            this.ResetButton.TabIndex = 16;
+            this.ResetButton.Text = "Reset";
+            this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(722, 411);
+            this.Controls.Add(this.ResetButton);
+            this.Controls.Add(this.StartButton);
+            this.Controls.Add(this.TimerLabel);
             this.Controls.Add(this.ConfigureControllerButton);
             this.Controls.Add(this.AddControllerButton);
             this.Controls.Add(this.UseControllerButton);
@@ -218,16 +288,19 @@
             this.Controls.Add(this.ScanButton);
             this.Controls.Add(this.manualAddButton);
             this.Controls.Add(this.ConnectionsList);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
             this.Text = "CHS ROV 2K19";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
         private System.Windows.Forms.TableLayoutPanel ConnectionsList;
         private System.Windows.Forms.Button manualAddButton;
         private System.Windows.Forms.Button ScanButton;
@@ -241,6 +314,13 @@
         private System.Windows.Forms.Button UseControllerButton;
         private System.Windows.Forms.Button AddControllerButton;
         private System.Windows.Forms.Button ConfigureControllerButton;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem missionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripTextBox1;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label TimerLabel;
+        private System.Windows.Forms.Button StartButton;
+        private System.Windows.Forms.Button ResetButton;
     }
 }
 

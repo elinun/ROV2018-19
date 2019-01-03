@@ -61,7 +61,7 @@
     <Compile Include="Views\ManualConnectionAddDialog.Designer.cs">
       <DependentUpon>ManualConnectionAddDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Prompt.cs" />
+    <Compile Include="Views\Miscellaneous.cs" />
     <Compile Include="Views\ConnectionScanProgressDialog.cs">
       <SubType>Form</SubType>
     </Compile>

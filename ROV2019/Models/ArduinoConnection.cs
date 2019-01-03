@@ -13,16 +13,21 @@ namespace ROV2019.Models
 
     public class ArduinoConnection
     {
+
         public string IpAddress { get; set; }
         public int Port { get; set; }
         public string Password { get; set; }
         public string FriendlyName { get; set; }
         public int Latency { get; set; }
-        public Trim Trim { get; set; }
+        public Trim Trim { get; set; } = new Trim();
     }
 
     public class Trim
     {
-        
+        //How much it drifts left to right when moving forward
+        public int LeftToRightCorrection { get; set; }
+        //How much it drifts front to back when moving side to side
+        public int FrontToBackCorrection { get; set; }
+        public int RollCorrection { get; set; }
     }
 }

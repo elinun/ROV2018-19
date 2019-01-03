@@ -135,7 +135,9 @@ namespace ROV2019.Models
     
     public class ConfiguredPollData
     {
+        [System.Obsolete("Use ThrusterSpeeds instead")]
         public (int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed) Vectors { get; set; }
+        public Dictionary<Thrusters, int> ThrusterSpeeds { get; set; }
         public Dictionary<int, int> ServoSpeeds { get; set; }
         //add acessories later
     }

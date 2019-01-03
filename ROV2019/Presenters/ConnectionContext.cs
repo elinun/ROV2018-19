@@ -50,16 +50,17 @@ namespace ROV2019.Presenters
 
         public bool isConnected()
         {
-            if(client != null && stream != null)
+            try
             {
-                return client.Connected;
+                stream.Write(ArduinoCommand.GetBytes(" "), 0, 1);
+                return true;
             }
-            return false;
+            catch (Exception) { return false; }
         }
 
         public (int AcX, int AcY, int AcZ, int Temp, int GyX, int GyY, int GyZ) GetAccelerations()
         {
-            if(isConnected())
+            try
             {
                 ArduinoCommand cmd = new ArduinoCommand()
                 {
@@ -69,9 +70,9 @@ namespace ROV2019.Presenters
                 stream.Write(toWrite, 0, toWrite.Length);
                 char c;
                 StringBuilder sb = new StringBuilder();
-                while((c=(char)stream.ReadByte()) != '}')
+                while ((c = (char)stream.ReadByte()) != '}')
                 {
-                    if(c != '{')
+                    if (c != '{')
                         sb.Append(c);
                 }
                 string str = sb.ToString();
@@ -85,7 +86,19 @@ namespace ROV2019.Presenters
                 int GyZ = int.Parse(vals[6].Substring(2));
                 return (X, Y, Z, temp, GyX, GyY, GyZ);
             }
-            return (0,0,0,0,0,0,0);
+            catch (Exception) { return (0, 0, 0, 0, 0, 0, 0); }
+        }
+
+        public void Stop()
+        {
+            if (isConnected())
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    SetThruster((Thrusters)Enum.Parse(typeof(Thrusters), i.ToString()), 1500);
+
+                }    
+            }
         }
 
         public string GetName()
@@ -116,102 +129,56 @@ namespace ROV2019.Presenters
         //Sends the authorize command to arduino. Should be the first command sent, besides GetName.
         public bool Authorize()
         {
-            ArduinoCommand command = new ArduinoCommand()
+            try
             {
-                Command = Command.Authorize,
-                NumberOfReturnedBytes = 1
-            };
-            command.Parameters.Add(ArduinoCommand.GetBytes(connection.Password));
-            if (isConnected())
-            {
+                ArduinoCommand command = new ArduinoCommand()
+                {
+                    Command = Command.Authorize,
+                    NumberOfReturnedBytes = 1
+                };
+                command.Parameters.Add(ArduinoCommand.GetBytes(connection.Password));
                 byte[] toWrite = command.GetCommandBytes();
                 stream.Write(toWrite, 0, toWrite.Length);
                 byte[] toRead = new byte[1];
                 stream.Read(toRead, 0, toRead.Length);
                 return (toRead[0] == 0x01);
             }
-            return false;
+            catch (Exception) { return false; }
         }
 
-        public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed)
+        public void MoveAndAddTrim(int VL, int VR, int FL, int FR, int BL, int BR)
         {
-            //calculate the power to send to each thruster.
-            int leftPower = 1500 + verticalSpeed;
-            int rightPower = 1500 + verticalSpeed;
 
-            leftPower += rollSpeed;
-            rightPower -= rollSpeed;
 
-            //TODO: Add trim
+            //Trim
+            VR += connection.Trim.RollCorrection;
+            VL -= connection.Trim.RollCorrection;
+                                                                     
+            VL = (VL > 1500 ? Math.Min(VL, 1900) : Math.Max(VL, 1100));
+            VR = (VR > 1500 ? Math.Min(VR, 1900) : Math.Max(VR, 1100));
 
-            leftPower = (leftPower > 1500 ? Math.Min(leftPower, 1900) : Math.Max(leftPower, 1100));
-            rightPower = (rightPower > 1500 ? Math.Min(rightPower, 1900) : Math.Max(rightPower, 1100));
-
-            SetThruster(Thrusters.VerticalLeft, leftPower);
-            SetThruster(Thrusters.VerticalRight, rightPower);
-            MoveVectors(forwardSpeed, lateralSpeed, rotationalSpeed);
+            SetThruster(Thrusters.VerticalLeft, VL);
+            SetThruster(Thrusters.VerticalRight, VR);
+            MoveAndAddTrim(FR, FL, BL, BR);
         }
 
-        public void MoveVectors(int forwardSpeed, int lateralSpeed, int rotationalSpeed)
-        {
-            /*The thrusters do not produce the same amount of thrust 
-             *when they go forward as when they go backwards. This means that
-             * when we move side to side we have to slow down the forward
-             * thrusters. The variable below is how much to slow it down.
-             * I currently have it set according to bluerobotic's documentation.
-             * Max Backwards thrust/Max Forward thrust
-             */
-            double CorrectionFactor = 0.78846153846;
-            //calculate the power to send to each thruster.
-            int FLPwr = 1500;
-            int FRPwr = 1500;
-            int BLPwr = 1500;
-            int BRPwr = 1500;
+        //Adds the trim associated with this connection and sends command to turn on the thrusters
+        //Parameters are the microsecond pulse lengths generated from ControllerConfig.
+        public void MoveAndAddTrim(int FLPwr, int FRPwr, int BLPwr, int BRPwr)
+        {        
 
-            //forward vector
-            FLPwr += forwardSpeed;
-            FRPwr += forwardSpeed;
-            BLPwr += forwardSpeed;
-            BRPwr += forwardSpeed;
+            //Add trim. May need to add correction factor
+            FLPwr -= connection.Trim.LeftToRightCorrection;
+            FLPwr -= connection.Trim.FrontToBackCorrection;
 
-            //lateral Vector
-            if(lateralSpeed>0)
-            {
-                //right
-                FLPwr += (int)(lateralSpeed * CorrectionFactor);
-                FRPwr -= lateralSpeed;
-                BLPwr -= lateralSpeed;
-                BRPwr += (int)(lateralSpeed * CorrectionFactor);
-            }
-            else if(lateralSpeed < 0)
-            {
-                //left
-                //remember, adding a negative
-                FLPwr += lateralSpeed;
-                FRPwr -= (int)(lateralSpeed * CorrectionFactor);
-                BLPwr -= (int)(lateralSpeed * CorrectionFactor);
-                BRPwr += lateralSpeed;
-            }
+            FRPwr += connection.Trim.LeftToRightCorrection;
+            FRPwr += connection.Trim.FrontToBackCorrection;
 
-            //rotation
-            if(rotationalSpeed>0)
-            {
-                //clockwise
-                FLPwr += (int)(lateralSpeed * CorrectionFactor);
-                FRPwr -= lateralSpeed;
-                BLPwr += (int)(lateralSpeed * CorrectionFactor);
-                BRPwr -= lateralSpeed;
-            }
-            else if(rotationalSpeed<0)
-            {
-                //counter-clockwise, or anti-clockwise if ur British
-                FLPwr -= lateralSpeed;
-                FRPwr += (int)(lateralSpeed * CorrectionFactor);
-                BLPwr -= lateralSpeed;
-                BRPwr += (int)(lateralSpeed * CorrectionFactor);
-            }
+            BLPwr -= connection.Trim.LeftToRightCorrection;
+            BLPwr -= connection.Trim.FrontToBackCorrection;
 
-            //TODO: Add trim.
+            BRPwr += connection.Trim.LeftToRightCorrection;
+            BRPwr += connection.Trim.FrontToBackCorrection;
 
             FLPwr = (FLPwr > 1500 ? Math.Min(FLPwr, 1900) : Math.Max(FLPwr, 1100));
             FRPwr = (FRPwr > 1500 ? Math.Min(FRPwr, 1900) : Math.Max(FRPwr, 1100));
@@ -225,42 +192,44 @@ namespace ROV2019.Presenters
             SetThruster(Thrusters.BackRight, BRPwr);
         }
 
-        public bool VerticalStabilize(int verticalSpeed, int rollSpeed)
+        public bool VerticalStabilize(int verticalLeftPwr, int verticalRightPwr)
         {
-            ArduinoCommand command = new ArduinoCommand()
+            try
             {
-                Command = Command.VerticalStabilize,
-                NumberOfReturnedBytes = 0
-            };
-            command.AddParameter(verticalSpeed);
-            command.AddParameter(rollSpeed);
-            if (isConnected())
-            {
+                ArduinoCommand command = new ArduinoCommand()
+                {
+                    Command = Command.VerticalStabilize,
+                    NumberOfReturnedBytes = 0
+                };
+                int verticalSpeed = ((verticalLeftPwr + verticalRightPwr) / 2) - 1500;
+                int rollPos = (verticalLeftPwr - verticalRightPwr) / 2;
+                command.AddParameter(verticalSpeed);
+                command.AddParameter(rollPos);
                 byte[] toWrite = command.GetCommandBytes();
                 stream.Write(toWrite, 0, toWrite.Length);
                 return true;
             }
-
-            return false;
+            catch (Exception) { return false; }
         }
 
         public bool SetThruster(Thrusters thruster, int value)
         {
-            ArduinoCommand command = new ArduinoCommand()
+            try
             {
-                Command = Command.SetThruster,
-                NumberOfReturnedBytes = 0
-            };
-            command.AddParameter((int)thruster);
-            command.AddParameter(value);
-            if (isConnected())
-            {
-                byte[] toWrite = command.GetCommandBytes();
-                stream.Write(toWrite, 0, toWrite.Length);
-                return true;
+                ArduinoCommand command = new ArduinoCommand()
+                {
+                    Command = Command.SetThruster,
+                    NumberOfReturnedBytes = 0
+                };
+                command.AddParameter((int)thruster);
+                command.AddParameter(value);
+                {
+                    byte[] toWrite = command.GetCommandBytes();
+                    stream.Write(toWrite, 0, toWrite.Length);
+                    return true;
+                }
             }
-
-            return false;
+            catch (Exception) { return false; }
         }
     }
 }

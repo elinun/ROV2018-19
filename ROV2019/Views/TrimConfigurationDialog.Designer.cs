@@ -41,7 +41,9 @@
             this.YawTrackBar = new System.Windows.Forms.TrackBar();
             this.LeftDriftLabel = new System.Windows.Forms.Label();
             this.RollTrackBar = new System.Windows.Forms.TrackBar();
-            this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.RunTimeField)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ForwardTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.YawTrackBar)).BeginInit();
@@ -154,6 +156,7 @@
             this.ForwardTrackBar.Size = new System.Drawing.Size(182, 45);
             this.ForwardTrackBar.TabIndex = 9;
             this.ForwardTrackBar.TickFrequency = 10;
+            this.ForwardTrackBar.Scroll += new System.EventHandler(this.ForwardTrackBar_Scroll);
             // 
             // YawTrackBar
             // 
@@ -167,15 +170,16 @@
             this.YawTrackBar.Size = new System.Drawing.Size(45, 182);
             this.YawTrackBar.TabIndex = 10;
             this.YawTrackBar.TickFrequency = 10;
+            this.YawTrackBar.Scroll += new System.EventHandler(this.YawTrackBar_Scroll);
             // 
             // LeftDriftLabel
             // 
             this.LeftDriftLabel.AutoSize = true;
-            this.LeftDriftLabel.Location = new System.Drawing.Point(43, 134);
+            this.LeftDriftLabel.Location = new System.Drawing.Point(65, 159);
             this.LeftDriftLabel.Name = "LeftDriftLabel";
-            this.LeftDriftLabel.Size = new System.Drawing.Size(151, 13);
+            this.LeftDriftLabel.Size = new System.Drawing.Size(80, 13);
             this.LeftDriftLabel.TabIndex = 12;
-            this.LeftDriftLabel.Text = "How much did it drift left/right?";
+            this.LeftDriftLabel.Text = "Left/Right Drift:";
             // 
             // RollTrackBar
             // 
@@ -188,22 +192,43 @@
             this.RollTrackBar.Size = new System.Drawing.Size(182, 45);
             this.RollTrackBar.TabIndex = 13;
             this.RollTrackBar.TickFrequency = 10;
+            this.RollTrackBar.Scroll += new System.EventHandler(this.RollTrackBar_Scroll);
             // 
-            // button1
+            // label1
             // 
-            this.button1.Location = new System.Drawing.Point(330, 374);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 35);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "Manual ConfigurationClass";
-            this.button1.UseVisualStyleBackColor = true;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(223, 159);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(86, 13);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Front/Back Drift:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(363, 159);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(106, 13);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "Up/Down Drift (Roll):";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(105, 57);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(234, 13);
+            this.label3.TabIndex = 17;
+            this.label3.Text = "Don\'t use these buttons to move: Use controller.";
             // 
             // TrimConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(543, 421);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.RollTrackBar);
             this.Controls.Add(this.LeftDriftLabel);
             this.Controls.Add(this.YawTrackBar);
@@ -243,6 +268,8 @@
         private System.Windows.Forms.TrackBar YawTrackBar;
         private System.Windows.Forms.Label LeftDriftLabel;
         private System.Windows.Forms.TrackBar RollTrackBar;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }

@@ -62,13 +62,83 @@ namespace ROV2019.ControllerConfigurations
             rollSpeed -= (controller.Buttons[4] && rollSpeed > -250 ? 1 : 0);
             rollSpeed += (controller.Buttons[5]  && rollSpeed < 250? 1 : 0);
 
-            (int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed) mVectors = (
-            controller.X,
-            controller.Y, controller.Z, verticalSpeed, rollSpeed);
+            Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
+
+            /*The thrusters do not produce the same amount of thrust 
+             *when they go forward as when they go backwards. This means that
+             * when we move side to side we have to slow down the forward
+             * thrusters. The variable below is how much to slow it down.
+             * I currently have it set according to bluerobotic's documentation.
+             * Max Backwards thrust/Max Forward thrust
+             */
+            double CorrectionFactor = 0.78846153846;
+            //calculate the power to send to each thruster.
+            int FLPwr = 1500;
+            int FRPwr = 1500;
+            int BLPwr = 1500;
+            int BRPwr = 1500;
+
+            //forward vector
+            FLPwr += controller.X;
+            FRPwr += controller.X;
+            BLPwr += controller.X;
+            BRPwr += controller.X;
+
+            //lateral Vector
+            if (controller.Y > 0)
+            {
+                //right
+                FLPwr += (int)(controller.Y * CorrectionFactor);
+                FRPwr -= controller.Y;
+                BLPwr -= controller.Y;
+                BRPwr += (int)(controller.Y * CorrectionFactor);
+            }
+            else if (controller.Y < 0)
+            {
+                //left
+                //remember, adding a negative
+                FLPwr += controller.Y;
+                FRPwr -= (int)(controller.Y * CorrectionFactor);
+                BLPwr -= (int)(controller.Y * CorrectionFactor);
+                BRPwr += controller.Y;
+            }
+
+            //rotation
+            if (controller.Z > 0)
+            {
+                //clockwise
+                FLPwr += (int)(controller.Y * CorrectionFactor);
+                FRPwr -= controller.Y;
+                BLPwr += (int)(controller.Y * CorrectionFactor);
+                BRPwr -= controller.Y;
+            }
+            else if (controller.Z < 0)
+            {
+                //counter-clockwise, or anti-clockwise if ur British
+                FLPwr -= controller.Y;
+                FRPwr += (int)(controller.Y * CorrectionFactor);
+                BLPwr -= controller.Y;
+                BRPwr += (int)(controller.Y * CorrectionFactor);
+            }
+
+            //vertical
+            //calculate the power to send to each thruster.
+            int leftPower = 1500 + verticalSpeed;
+            int rightPower = 1500 + verticalSpeed;
+
+            leftPower += rollSpeed;
+            rightPower -= rollSpeed;
+
+            thrusterSpeeds.Add(Thrusters.FrontLeft, FLPwr);
+            thrusterSpeeds.Add(Thrusters.FrontRight, FRPwr);
+            thrusterSpeeds.Add(Thrusters.BackRight, BRPwr);
+            thrusterSpeeds.Add(Thrusters.BackLeft, BLPwr);
+            thrusterSpeeds.Add(Thrusters.VerticalLeft, leftPower);
+            thrusterSpeeds.Add(Thrusters.VerticalRight, rightPower);
 
             ConfiguredPollData data = new ConfiguredPollData()
             {
-                Vectors = mVectors,
+                ThrusterSpeeds = thrusterSpeeds,
                 ServoSpeeds = new Dictionary<int, int>()
             };
             return data;

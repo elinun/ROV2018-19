@@ -27,6 +27,7 @@ namespace ROV2019
 
         ControllerManager ControllerManager;
         ControllerInfo SelectedController = null;
+        bool IsOpen;
 
         public Main()
         {
@@ -37,6 +38,7 @@ namespace ROV2019
 
             PopulateConnectionsList();
             PopulateControllersList();
+            IsOpen = true;
 
             Thread controllerCheckerThread = new Thread(UpdateControllerConnectedStatus);
             controllerCheckerThread.IsBackground = true;
@@ -45,26 +47,39 @@ namespace ROV2019
 
         private void UpdateControllerConnectedStatus()
         {
-            while (true)
+            bool wasPreviouslyDisconnected = false;
+            while (IsOpen)
             {
-                if (IsHandleCreated)
+                if (IsHandleCreated && !(Disposing || IsDisposed))
                 {
-                    Invoke(new MethodInvoker(delegate
+                    try
                     {
-                        foreach (Control c in ControllersListTable.Controls)
+                        Invoke(new MethodInvoker(delegate
                         {
-                            ControllerInfo info = (ControllerInfo)c.Tag;
-                            if (!ControllerManager.IsControllerConnected(info))
+                            foreach (Control c in ControllersListTable.Controls)
                             {
-                                c.BackColor = Color.Orange;
+                                ControllerInfo info = (ControllerInfo)c.Tag;
+                                if (!ControllerManager.IsControllerConnected(info))
+                                {
+                                    c.BackColor = Color.Orange;
+                                    if (mesher != null && mesher.IsMeshing)
+                                        StopMesh();
+                                    if (openConnection != null && !wasPreviouslyDisconnected)
+                                        openConnection.Stop();
+                                    wasPreviouslyDisconnected = true;
+                                }
+                                else
+                                {
+                                    c.BackColor = Color.Transparent;
+                                    if (wasPreviouslyDisconnected && mesher != null)
+                                        InitiateMesh();
+                                    wasPreviouslyDisconnected = false;
+                                }
                             }
-                            else
-                            {
-                                c.BackColor = Color.Transparent;
-                            }
-                        }
 
-                    }));
+                        }));
+                    }
+                    catch (Exception) { IsOpen = false; };
                 }
                 Thread.Sleep(250);
             }
@@ -126,9 +141,10 @@ namespace ROV2019
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
+            IsOpen = false;
             if (mesher != null && mesher.IsMeshing)
             {
-                mesher.StopMesh();
+                StopMesh();
             }
             if(openConnection != null && openConnection.isConnected())
             {
@@ -239,6 +255,11 @@ namespace ROV2019
                     //TODO: Refactor maybe
                     button.Text = "Disconnect";
                     setConnectionListItemDisplayConnected(true);
+                    //start mesh if controller available
+                    if(SelectedController != null && ControllerManager.IsControllerConnected(SelectedController))
+                    {
+
+                    }
                 }
                 else
                 {
@@ -261,12 +282,15 @@ namespace ROV2019
                 PopulateConnectionsList();
             });
             ConnectionScanProgressDialog scanProgressDialog = new ConnectionScanProgressDialog(connectionManager, discoverConnectionListener);
-            scanProgressDialog.Show();
+            scanProgressDialog.ShowDialog();
         }
 
         private void ConfigureTrimButton_Click(object sender, EventArgs e)
         {
             TrimConfigurationDialog configurationDialog = new TrimConfigurationDialog(connectionManager, selectedConnection);
+            configurationDialog.ShowDialog();
+            //need to repopulate to get the new trim properties so if this dialog is opened again, it reflects those values.
+            PopulateConnectionsList();
         }
 
         private void SensorButton_Click(object sender, EventArgs e)
@@ -290,35 +314,73 @@ namespace ROV2019
 
         private void UseControllerButton_Click(object sender, EventArgs e)
         {
-            Button button = (Button)sender;
-            if (button.Text.Contains("Stop"))
+            if (UseControllerButton.Text.Contains("Stop"))
             {
 
-                button.Text = "Use";
-                if(mesher != null)
-                {
-                    mesher.StopMesh();
-                }
+                UseControllerButton.Text = "Use";
+                StopMesh();
             }
             else
             {
-
-                if (openConnection != null && openConnection.isConnected() && ControllerManager.IsControllerConnected(SelectedController))
-                {
-                    //start the mesh
-
-                    //read what type of configuration to use from saved properties.
-                    ControllerConfiguration config = ControllerManager.GetConfiguration(SelectedController);
-                    mesher = new ConnectionControllerMesher(openConnection, config);
-                    mesher.StartMesh();
-                    UseControllerButton.Text = "Stop Using";
-
-                }
+                InitiateMesh();
+                UseControllerButton.Text = "Stop Using";
             }
         }
 
-        #endregion
+    #endregion
 
-        
+    private void StopMesh()
+    {
+            if (mesher != null)
+                mesher.StopMesh();
+    }
+
+    private void InitiateMesh()
+    {
+        if (openConnection != null && openConnection.isConnected() && ControllerManager.IsControllerConnected(SelectedController))
+        {
+            //start the mesh
+
+            //read what type of configuration to use from saved properties.
+            ControllerConfiguration config = ControllerManager.GetConfiguration(SelectedController);
+            mesher = new ConnectionControllerMesher(openConnection, config);
+            mesher.StartMesh();
+
+        }
+    }
+
+        #region Timer
+
+        int seconds = 0;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            seconds++;
+            int leftOverseconds = seconds % 60;
+            TimerLabel.Text = seconds/60+":"+(leftOverseconds/10)+leftOverseconds%10;
+        }
+
+        private void StartButton_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            if(button.Text.Equals("Start"))
+            {
+                button.Text = "Stop";
+                timer1.Interval = 990;
+                timer1.Start();
+            }
+            else
+            {
+                button.Text = "Start";
+                timer1.Stop();
+            }
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            seconds = 0;
+            TimerLabel.Text = "0:00";
+        }
+
+        #endregion
     }
 }

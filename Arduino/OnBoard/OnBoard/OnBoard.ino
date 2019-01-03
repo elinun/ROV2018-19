@@ -229,9 +229,9 @@ void VerticalStabilize(int vectors[])
   }
   if(rollPID.Compute())
   {
-    Serial.print("Raw = ");Serial.print(accel[1]);
-    Serial.print("| Input = ");Serial.print(Input);
-    Serial.print(" | Output = "); Serial.println(Output);
+    //Serial.print("Raw = ");Serial.print(accel[1]);
+    //Serial.print("| Input = ");Serial.print(Input);
+    //Serial.print(" | Output = "); Serial.println(Output);
   }
   VL.writeMicroseconds(1500+vectors[0]+(Output/2));
   VR.writeMicroseconds(1500+vectors[0]+(Output/-2));
