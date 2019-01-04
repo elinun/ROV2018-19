@@ -27,6 +27,8 @@ namespace ROV2019
 
         ControllerManager ControllerManager;
         ControllerInfo SelectedController = null;
+        bool UsingSelectedController = false;
+
         bool IsOpen;
 
         public Main()
@@ -56,26 +58,29 @@ namespace ROV2019
                     {
                         Invoke(new MethodInvoker(delegate
                         {
-                            foreach (Control c in ControllersListTable.Controls)
+                            try
                             {
-                                ControllerInfo info = (ControllerInfo)c.Tag;
-                                if (!ControllerManager.IsControllerConnected(info))
+                                foreach (Control c in ControllersListTable.Controls)
                                 {
-                                    c.BackColor = Color.Orange;
-                                    if (mesher != null && mesher.IsMeshing)
+                                    ControllerInfo info = (ControllerInfo)c.Tag;
+                                    if (!ControllerManager.IsControllerConnected(info))
+                                    {
+                                        c.BackColor = Color.Orange;
                                         StopMesh();
-                                    if (openConnection != null && !wasPreviouslyDisconnected)
-                                        openConnection.Stop();
-                                    wasPreviouslyDisconnected = true;
-                                }
-                                else
-                                {
-                                    c.BackColor = Color.Transparent;
-                                    if (wasPreviouslyDisconnected && mesher != null)
-                                        InitiateMesh();
-                                    wasPreviouslyDisconnected = false;
+                                        if (openConnection != null && !wasPreviouslyDisconnected)
+                                            openConnection.Stop();
+                                        wasPreviouslyDisconnected = true;
+                                    }
+                                    else
+                                    {
+                                        c.BackColor = (SelectedController == info ? Color.Yellow : Color.Transparent);
+                                        if (wasPreviouslyDisconnected)
+                                            InitiateMesh();
+                                        wasPreviouslyDisconnected = false;
+                                    }
                                 }
                             }
+                            catch (Exception e) { System.Diagnostics.Debug.Write(""); }
 
                         }));
                     }
@@ -142,10 +147,7 @@ namespace ROV2019
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             IsOpen = false;
-            if (mesher != null && mesher.IsMeshing)
-            {
-                StopMesh();
-            }
+            StopMesh();
             if(openConnection != null && openConnection.isConnected())
             {
                 openConnection.Close();
@@ -258,7 +260,7 @@ namespace ROV2019
                     //start mesh if controller available
                     if(SelectedController != null && ControllerManager.IsControllerConnected(SelectedController))
                     {
-
+                        InitiateMesh();
                     }
                 }
                 else
@@ -268,6 +270,7 @@ namespace ROV2019
             }
             else
             {
+                StopMesh();
                 openConnection.Close();
                 button.Text = "Connect";
                 //TODO: Refactor
@@ -316,12 +319,13 @@ namespace ROV2019
         {
             if (UseControllerButton.Text.Contains("Stop"))
             {
-
-                UseControllerButton.Text = "Use";
+                UsingSelectedController = false;
                 StopMesh();
+                UseControllerButton.Text = "Use";
             }
             else
             {
+                UsingSelectedController = true;
                 InitiateMesh();
                 UseControllerButton.Text = "Stop Using";
             }
@@ -333,11 +337,16 @@ namespace ROV2019
     {
             if (mesher != null)
                 mesher.StopMesh();
-    }
+            mesher = null;
+            if (openConnection != null)
+                openConnection.Stop();
 
-    private void InitiateMesh()
+        }
+
+    private bool InitiateMesh()
     {
-        if (openConnection != null && openConnection.isConnected() && ControllerManager.IsControllerConnected(SelectedController))
+        if (openConnection != null && openConnection.isConnected() && ControllerManager.IsControllerConnected(SelectedController)
+                && UsingSelectedController && mesher == null)
         {
             //start the mesh
 
@@ -345,8 +354,10 @@ namespace ROV2019
             ControllerConfiguration config = ControllerManager.GetConfiguration(SelectedController);
             mesher = new ConnectionControllerMesher(openConnection, config);
             mesher.StartMesh();
+            return true;
 
         }
+            return false;
     }
 
         #region Timer

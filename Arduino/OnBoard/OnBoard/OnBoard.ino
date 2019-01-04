@@ -55,13 +55,21 @@ void setup() {
 
   //Setup PID
   Setpoint = 0;
-  Input = 1;
+  Input = 0;
   rollPID.SetOutputLimits(-255,255);
   rollPID.SetMode(AUTOMATIC);
+  
   //Start Server
   server.begin();
+  
   //Set-up thrusters
-
+  //see documentation for pin assignments. https://docs.google.com/document/d/1n_Al_vgk9xdAz7ClMqiYWrTyUFkZcng_2KTTv5HQe0o/edit
+  FL.attach(2);
+  FR.attach(3);
+  BL.attach(5);
+  BR.attach(6);
+  VL.attach(7);
+  VR.attach(8);
 
   //Send Stop signal
   Stop();  
@@ -79,17 +87,16 @@ void loop() {
       {
         //parse command from client stream
           char c;
-          bool foundCommandName = false;
           String commandName = "";
           String currentParameter = "";
           std::vector<String> parameters;
-          while((c = client.read()) != '}')
+          while((c = client.read()) != '}' && c > -1)
           {
             if(c == '{')
             {
               parameters.clear();
               //loop until we reach the end of command name
-              while((c = client.read()) != ':')
+              while((c = client.read()) != ':' && c > -1)
               {
                 commandName += c;
               }
@@ -131,7 +138,7 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     }
     else
     {
-      client.write(0x02);
+      client.write((byte)0);
       Authorized = false;
     }
   }
@@ -171,7 +178,14 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
   }
   else if(name == "SetThruster" && Authorized)
   {
-    
+    int parameters[2];
+    for(int i = 0; i<2;i++)
+    {
+      char str[params[i].length()];
+      params[i].toCharArray(str, sizeof(str));
+      parameters[i] = atoi(str);
+    }
+    SetThruster(parameters[0], parameters[1]);
   }
 }
 
