@@ -58,29 +58,33 @@ namespace ROV2019
                     {
                         Invoke(new MethodInvoker(delegate
                         {
-                            try
-                            {
                                 foreach (Control c in ControllersListTable.Controls)
                                 {
                                     ControllerInfo info = (ControllerInfo)c.Tag;
                                     if (!ControllerManager.IsControllerConnected(info))
                                     {
                                         c.BackColor = Color.Orange;
+                                    if (SelectedController == info)
+                                    {
                                         StopMesh();
-                                        if (openConnection != null && !wasPreviouslyDisconnected)
-                                            openConnection.Stop();
                                         wasPreviouslyDisconnected = true;
+                                    }
                                     }
                                     else
                                     {
-                                        c.BackColor = (SelectedController == info ? Color.Yellow : Color.Transparent);
-                                        if (wasPreviouslyDisconnected)
-                                            InitiateMesh();
-                                        wasPreviouslyDisconnected = false;
+                                        if (SelectedController == info)
+                                        {
+                                            c.BackColor = (UsingSelectedController ? Color.Green : Color.Yellow);
+                                           if (wasPreviouslyDisconnected)
+                                                InitiateMesh();
+                                           wasPreviouslyDisconnected = false;
+                                        }
+                                        else
+                                        {
+                                            c.BackColor = Color.Transparent;
+                                        }
                                     }
                                 }
-                            }
-                            catch (Exception e) { System.Diagnostics.Debug.Write(""); }
 
                         }));
                     }
@@ -336,8 +340,11 @@ namespace ROV2019
     private void StopMesh()
     {
             if (mesher != null)
+            {
                 mesher.StopMesh();
-            mesher = null;
+                mesher = null;
+            }
+
             if (openConnection != null)
                 openConnection.Stop();
 
