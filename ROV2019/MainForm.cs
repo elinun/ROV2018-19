@@ -35,6 +35,11 @@ namespace ROV2019
         {
             InitializeComponent();
 
+            attitudeIndicator1.RollMax = 4096;
+            attitudeIndicator1.RollMin = -4096;
+            attitudeIndicator1.PitchMax = 4096;
+            attitudeIndicator1.PitchMin = -4096;
+
             connectionManager = new ConnectionManager();
             ControllerManager = new ControllerManager();
 
@@ -85,12 +90,18 @@ namespace ROV2019
                                         }
                                     }
                                 }
+                            if (openConnection != null)
+                            {
+                                var accels = openConnection.GetAccelerations();
+                                attitudeIndicator1.RollValue = accels.AcY;
+                                attitudeIndicator1.PitchValue = accels.AcZ;
+                            }
 
                         }));
                     }
                     catch (Exception) { IsOpen = false; };
                 }
-                Thread.Sleep(250);
+                Thread.Sleep(25);
             }
         }
 

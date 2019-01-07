@@ -57,21 +57,27 @@ namespace ROV2019.Views
         public int RollMax { get; set; } = 255;
         public int RollMin { get; set; } = -255;
         private int rollValue;
-        public int RollValue { get { return this.rollValue; } set { this.rollValue = value; Invalidate(); } }
+        public int RollValue { get { return rollValue; } set { rollValue = value; Invalidate(); } }
 
         public int PitchMax { get; set; } = 255;
-        public int PitchMin { get; set; } = 255;
+        public int PitchMin { get; set; } = -255;
         private int pitchValue;
-        public int PitchValue { get { return this.pitchValue; } set { this.pitchValue = value;  Invalidate(); } }
+        public int PitchValue { get { return pitchValue; } set { pitchValue = value;  Invalidate(); } }
 
         private int pixelRange;
         private int cX;
         private int cY;
 
+        private int circleCX;
+        private int circleCY;
+
         protected override void OnPaint(PaintEventArgs e)
         {
             pixelRange = Math.Min(Size.Height, Size.Width);
+            circleCX = pixelRange / 2;
+            circleCY = pixelRange / 2;
             Graphics g = e.Graphics;
+            Pen black = new Pen(Color.Black);
             g.Clear(Color.White);
             //draw overlaying circle
             g.DrawArc(new Pen(Color.Black), 0, 0, pixelRange, pixelRange, 0, 360);
@@ -83,17 +89,57 @@ namespace ROV2019.Views
             double yPercent = (((PitchValue - PitchMin) / (double)(PitchMax - PitchMin)) - 0.0);
             cX = (int)(pixelRange * xPercent);
             cY = (int)(pixelRange * yPercent);
-            g.FillRectangle(new Pen(Color.Black).Brush, cX, cY, 10, 10);
-            Point arcStart = new Point((int)cX+(int)(Math.Sin(Math.PI * xPercent) * ((pixelRange-cX) / 2.5)), cY + (int)(Math.Cos(Math.PI * xPercent) * ((pixelRange-cY) / 2.5)));
-            g.FillRectangle(new Pen(Color.Black).Brush, arcStart.X, arcStart.Y, 10, 10);
-            Point[] topPoints = {
-                //start
-                
 
-                //end
-                new Point()
+            Point pitchArcStart = new Point(circleCX + (int)(Math.Sin(Math.PI * (yPercent)) * circleCX), circleCY + (int)(Math.Cos(Math.PI * ( yPercent)) * circleCY));
+            Point pitchArcEnd = new Point((int)(circleCX - (Math.Sin(Math.PI*(yPercent)) * circleCX)), (int)(circleCY + (Math.Cos(Math.PI * (yPercent)) * circleCY)));
+            Point rollArcStart = new Point((int)circleCX + (int)(Math.Sin(Math.PI * xPercent) * (circleCX)), circleCY + (int)(Math.Cos(Math.PI * xPercent) * (circleCY)));
+            Point rollArcEndt = new Point((int)circleCX - (int)(Math.Sin(Math.PI * xPercent) * (circleCX)), circleCY - (int)(Math.Cos(Math.PI * xPercent) * (circleCY)));
+
+            double rollStartTheta = Math.Atan((rollArcStart.Y - circleCY) / (rollArcStart.X - (double)circleCX));
+            double rollEndTheta = Math.Atan((rollArcEndt.Y - circleCY) / (rollArcEndt.X - (double)circleCX));
+            //the final points are the pitch points rotated by the same theta the roll points are rotated.
+            //This may or may not be able to be simplified.
+            //See this: https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
+            Point arcStart = RotatePoint(circleCX, circleCY, rollStartTheta, pitchArcStart);
+            Point arcEnd = RotatePoint(circleCX, circleCY, rollEndTheta, pitchArcEnd);
+            double startΘ = Math.Atan(((arcStart.Y - circleCY) / (arcStart.X - (double)circleCX)));
+            double endΘ = Math.Atan(((arcEnd.Y - circleCY) / (arcEnd.X - (double)circleCX)));
+            Point pointOnCircle = RotatePoint(circleCX, circleCY, (startΘ-endΘ)*2, arcStart);
+
+            /*g.FillRectangle(black.Brush, cX, cY, 10, 10);
+            g.FillRectangle(new Pen(Color.Red).Brush, pitchArcEnd.X, pitchArcEnd.Y, 10, 10);
+            g.FillRectangle(new Pen(Color.Red).Brush, pitchArcStart.X, pitchArcStart.Y, 10, 10);
+            g.FillRectangle(new Pen(Color.Blue).Brush, rollArcStart.X, rollArcStart.Y, 10, 10);
+            g.FillRectangle(new Pen(Color.Blue).Brush, rollArcEndt.X, rollArcEndt.Y, 10, 10);*/
+            g.FillRectangle(black.Brush, arcStart.X, arcStart.Y, 10, 10);
+            g.FillRectangle(black.Brush, arcEnd.X, arcEnd.Y, 10, 10);
+
+            Point[] Points = {
+                arcStart,
+                pointOnCircle,
+                arcEnd
             };
-            //g.FillClosedCurve(topPart.Brush, topPoints);
+            g.FillClosedCurve(topPart.Brush, Points);
+        }
+
+        private Point RotatePoint(int cx, int cy, double angle, Point p)
+        {
+            double s = Math.Sin(angle);
+            double c = Math.Cos(angle);
+
+            // translate point back to origin:
+            p.X -= cx;
+            p.Y -= cy;
+
+            // rotate point
+            //Fourmula: https://academo.org/demos/rotation-about-point/
+            double xnew = p.X * c - p.Y * s;
+            double ynew = p.X * s + p.Y * c;
+
+            // translate point back:
+            p.X = (int)xnew + cx;
+            p.Y = (int)ynew + cy;
+            return p;
         }
     }
 }
