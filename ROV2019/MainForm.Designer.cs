@@ -51,7 +51,6 @@ namespace ROV2019
             this.TimerLabel = new System.Windows.Forms.Label();
             this.StartButton = new System.Windows.Forms.Button();
             this.ResetButton = new System.Windows.Forms.Button();
-            this.attitudeIndicator1 = new ROV2019.Views.AttitudeIndicator();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -213,9 +212,6 @@ namespace ROV2019
             // 
             // menuStrip1
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripTextBox1,
-            this.missionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(722, 24);
@@ -267,27 +263,12 @@ namespace ROV2019
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
             // 
-            // attitudeIndicator1
-            // 
-            this.attitudeIndicator1.Location = new System.Drawing.Point(214, 12);
-            this.attitudeIndicator1.Name = "attitudeIndicator1";
-            this.attitudeIndicator1.PitchMax = 255;
-            this.attitudeIndicator1.PitchMin = 255;
-            this.attitudeIndicator1.PitchValue = 0;
-            this.attitudeIndicator1.RollMax = 255;
-            this.attitudeIndicator1.RollMin = -255;
-            this.attitudeIndicator1.RollValue = 0;
-            this.attitudeIndicator1.Size = new System.Drawing.Size(333, 303);
-            this.attitudeIndicator1.TabIndex = 17;
-            this.attitudeIndicator1.Text = "attitudeIndicator1";
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(722, 411);
-            this.Controls.Add(this.attitudeIndicator1);
             this.Controls.Add(this.ResetButton);
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.TimerLabel);
@@ -337,7 +318,6 @@ namespace ROV2019
         private System.Windows.Forms.Label TimerLabel;
         private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.Button ResetButton;
-        private AttitudeIndicator attitudeIndicator1;
     }
 }
 

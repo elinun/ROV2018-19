@@ -55,6 +55,12 @@
     <Compile Include="Controllers\PlayStation.cs" />
     <Compile Include="Presenters\ConnectionControllerMesher.cs" />
     <Compile Include="Presenters\ControllerManager.cs" />
+    <Compile Include="Views\AttitudeIndicatorInstrumentControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Views\InstrumentControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Views\ManualConnectionAddDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -107,6 +113,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Models\Controller.cs" />
     <EmbeddedResource Include="Views\TrimConfigurationDialog.resx">
@@ -126,6 +133,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\Horizon_Background.bmp" />
+    <Content Include="Resources\Horizon_GroundSky.bmp" />
+    <Content Include="Resources\Maquette_Avion.bmp" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

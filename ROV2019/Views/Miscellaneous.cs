@@ -51,7 +51,7 @@ namespace ROV2019.Views
             prompt.ShowDialog();
         }
     }
-
+    [Obsolete("Use AttitudeIndicatorInstrumentControl instead.")]
     public class AttitudeIndicator : Control
     {
         public int RollMax { get; set; } = 255;
@@ -104,7 +104,7 @@ namespace ROV2019.Views
             Point arcEnd = RotatePoint(circleCX, circleCY, rollEndTheta, pitchArcEnd);
             double startΘ = Math.Atan(((arcStart.Y - circleCY) / (arcStart.X - (double)circleCX)));
             double endΘ = Math.Atan(((arcEnd.Y - circleCY) / (arcEnd.X - (double)circleCX)));
-            Point pointOnCircle = RotatePoint(circleCX, circleCY, (startΘ-endΘ)*2, arcStart);
+            //Point pointOnCircle = RotatePoint(circleCX, circleCY, (startΘ-endΘ)*2, arcStart);
 
             /*g.FillRectangle(black.Brush, cX, cY, 10, 10);
             g.FillRectangle(new Pen(Color.Red).Brush, pitchArcEnd.X, pitchArcEnd.Y, 10, 10);
@@ -114,12 +114,12 @@ namespace ROV2019.Views
             g.FillRectangle(black.Brush, arcStart.X, arcStart.Y, 10, 10);
             g.FillRectangle(black.Brush, arcEnd.X, arcEnd.Y, 10, 10);
 
-            Point[] Points = {
-                arcStart,
-                pointOnCircle,
-                arcEnd
-            };
-            g.FillClosedCurve(topPart.Brush, Points);
+            Rectangle topRect = new Rectangle(arcEnd.X, 0, arcStart.X - arcEnd.X, Math.Max(arcEnd.Y, arcStart.Y)*2);
+
+            float Θ = (float)((Math.Atan((arcEnd.Y-arcStart.Y)/(arcEnd.X-(double)arcStart.X)))*(180/Math.PI));
+            //g.RotateTransform(Θ);
+            g.DrawRectangle(new Pen(Color.Orange), topRect);
+            g.FillPie(topPart.Brush, topRect, 180+Θ, 180);
         }
 
         private Point RotatePoint(int cx, int cy, double angle, Point p)
