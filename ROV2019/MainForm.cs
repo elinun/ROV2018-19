@@ -151,7 +151,7 @@ namespace ROV2019
         {
             IsOpen = false;
             StopMesh();
-            if(openConnection != null && openConnection.isConnected())
+            if(openConnection != null)
             {
                 openConnection.Close();
             }
@@ -241,7 +241,7 @@ namespace ROV2019
             Button button = (Button)sender;
             if (button.Text.Equals("Connect"))
             {
-                this.openConnection = new ConnectionContext(this.selectedConnection);
+                this.openConnection = connectionManager.GetConnectionContext(selectedConnection);
                 if (openConnection.OpenConnection())
                 {
                     //check authorization
@@ -259,6 +259,7 @@ namespace ROV2019
                     }
                     //TODO: Refactor maybe
                     button.Text = "Disconnect";
+                    Accelerations.StartPolling(openConnection);
                     setConnectionListItemDisplayConnected(true);
                     //start mesh if controller available
                     if(SelectedController != null && ControllerManager.IsControllerConnected(SelectedController))
@@ -274,6 +275,7 @@ namespace ROV2019
             else
             {
                 StopMesh();
+                Accelerations.StopPolling();
                 openConnection.Close();
                 button.Text = "Connect";
                 //TODO: Refactor

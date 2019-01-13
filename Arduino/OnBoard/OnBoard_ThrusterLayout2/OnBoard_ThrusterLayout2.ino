@@ -1,9 +1,3 @@
-/*
- * 
- * For Thruster Layout 1
- * 
- */
-
 #include <ArduinoSTL.h>
 #include<Servo.h>
 #include<Wire.h>
@@ -18,12 +12,8 @@ const int MPU_addr=0x68;
 
 bool Authorized = false;
 
-//PID
-double Input, Output, Setpoint;
-PID rollPID(&Input, &Output, &Setpoint,1,3,1, DIRECT);
-
-//Thrusters Front Left, Front Right...
-Servo FL, FR, BL, BR, VL, VR;
+//Thrusters Left, Right, VerticalFrontLeft...
+Servo FL, FR, VFL, VFR, VBL, VBR;
 
 EthernetServer server = EthernetServer(1740);
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  
@@ -58,12 +48,6 @@ void setup() {
   //Setup servos
 
   //Setup anything else
-
-  //Setup PID
-  Setpoint = 0;
-  Input = 0;
-  rollPID.SetOutputLimits(-255,255);
-  rollPID.SetMode(AUTOMATIC);
   
   //Start Server
   server.begin();
@@ -72,10 +56,10 @@ void setup() {
   //see documentation for pin assignments. https://docs.google.com/document/d/1n_Al_vgk9xdAz7ClMqiYWrTyUFkZcng_2KTTv5HQe0o/edit
   FL.attach(2);
   FR.attach(3);
-  BL.attach(5);
-  BR.attach(6);
-  VL.attach(7);
-  VR.attach(8);
+  VFL.attach(5);
+  VFR.attach(6);
+  VBL.attach(7);
+  VBR.attach(8);
 
   //Send Stop signal
   Stop();  
@@ -148,17 +132,6 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       Authorized = false;
     }
   }
-  else if(name == "VerticalStabilize" && Authorized)
-  {
-    int vectors[2];
-    for(int i = 0; i<2;i++)
-    {
-      char str[params[i].length()];
-      params[i].toCharArray(str, sizeof(str));
-      vectors[i] = atoi(str);
-    }
-    VerticalStabilize(vectors);
-  }
   else if(name == "GetAccelerations")
   {
     int16_t accel[7];
@@ -197,7 +170,7 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
 
 void Stop()
 {
-  for(int i = 0; i<6; i++)
+  for(int i = 0; i<10; i++)
   {
     SetThruster(i, 1500);
   }
@@ -213,6 +186,8 @@ void printIPAddress(){
 
   Serial.println();
 }
+
+
 void SetThruster(int thruster, int msValue)
 {
   switch(thruster)
@@ -223,7 +198,9 @@ void SetThruster(int thruster, int msValue)
     case 1:
       FR.writeMicroseconds(msValue);
       break;
-    case 2:
+    /*
+     * Not implemented on ROV with 4 vertical thrusters.
+     * case 2:
       BL.writeMicroseconds(msValue);
       break;
     case 3:
@@ -235,27 +212,19 @@ void SetThruster(int thruster, int msValue)
     case 5:
       VR.writeMicroseconds(msValue);
       break;
+      */
+    case 6:
+      VFL.writeMicroseconds(msValue);
+      break;
+    case 7:
+      VFR.writeMicroseconds(msValue);
+    case 8:
+      VBL.writeMicroseconds(msValue);
+      break;
+    case 9:
+      VBR.writeMicroseconds(msValue);
+      break;
   }
-}
-
-void VerticalStabilize(int vectors[])
-{
-  int16_t accel[7];
-  GetAccelerations(accel);
-  Input = map(accel[1], -4096, 4096, -255, 255);
-  if(abs(vectors[1])<256)
-  {
-    Setpoint = vectors[1];
-  }
-  if(rollPID.Compute())
-  {
-    //Serial.print("Raw = ");Serial.print(accel[1]);
-    //Serial.print("| Input = ");Serial.print(Input);
-    //Serial.print(" | Output = "); Serial.println(Output);
-  }
-  VL.writeMicroseconds(1500+vectors[0]+(Output/2));
-  VR.writeMicroseconds(1500+vectors[0]+(Output/-2));
-
 }
 
 void GetAccelerations(int16_t values[])

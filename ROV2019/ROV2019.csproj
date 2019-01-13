@@ -86,7 +86,7 @@
     <Compile Include="Models\ArduinoCommand.cs" />
     <Compile Include="Models\ArduinoConnection.cs" />
     <Compile Include="Models\ControllerInfo.cs" />
-    <Compile Include="Presenters\ConnectionContext.cs" />
+    <Compile Include="Presenters\ConnectionContexts.cs" />
     <Compile Include="Presenters\ConnectionManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

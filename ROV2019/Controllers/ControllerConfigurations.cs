@@ -1,4 +1,5 @@
 ﻿using ROV2019.Models;
+using ROV2019.Presenters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace ROV2019.ControllerConfigurations
 {
     public abstract class ControllerConfiguration
     {
+        //It makes sense for a controller configuration to work with a certain thruster layout.
+        //See ConnectionClass class.
+        public string Layout;
         public abstract ConfiguredPollData Poll();
         //not sure if this will be necessary.
         public ControllerConfiguration(Controller controller)
@@ -40,6 +44,7 @@ namespace ROV2019.ControllerConfigurations
         public Arcade(Controller c) : base(c)
         {
             controller = c;
+            Layout = ThrusterLayout.TL1;
         }
         public override ConfiguredPollData Poll()
         {
@@ -49,7 +54,6 @@ namespace ROV2019.ControllerConfigurations
             //map ROV movements to controlls on controller
 
             //try to prevent swapping directions on the thrusters,
-            
             int verticalSpeed = 0;
             if(canVerticalMove)
             {
@@ -140,6 +144,30 @@ namespace ROV2019.ControllerConfigurations
             {
                 ThrusterSpeeds = thrusterSpeeds,
                 ServoSpeeds = new Dictionary<int, int>()
+            };
+            return data;
+        }
+    }
+
+    public class Helicopter : ControllerConfiguration
+    {
+        Controller controller;
+        public Helicopter(Controller c) : base(c)
+        {
+            controller = c;
+            //Configuration for when we have 4 vertical thrusters.
+            Layout = ThrusterLayout.TL2;
+        }
+
+        public override ConfiguredPollData Poll()
+        {
+            //TODO: Implement configuration
+
+            //TODO: Add logic to move straight forward when tilted (pitched).
+
+            ConfiguredPollData data = new ConfiguredPollData()
+            {
+
             };
             return data;
         }

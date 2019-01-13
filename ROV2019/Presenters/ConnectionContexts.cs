@@ -1,21 +1,69 @@
-﻿using ROV2019.Models;
+﻿using ROV2019.ControllerConfigurations;
+using ROV2019.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace ROV2019.Presenters
 {
-    public class ConnectionContext
+    public class Accelerations
+    {
+        //This will minimize how often we poll the MPU chip.
+        public static (int AcX, int AcY, int AcZ, int Temp, int GyX, int GyY, int GyZ) AccelerationValues;
+        private static ConnectionContext connection;
+        private static int pollDelay = 50;
+        private static bool IsPolling;
+
+        private static void Poll()
+        {
+            while(IsPolling)
+            {
+                AccelerationValues = connection.GetAccelerations();
+                Thread.Sleep(pollDelay);
+            }
+        }
+
+        public static void StartPolling(ConnectionContext ctx)
+        {
+            connection = ctx;
+            if(!IsPolling)
+            {
+                IsPolling = true;
+                Thread pollThread = new Thread(Poll);
+                pollThread.IsBackground = true;
+                pollThread.Start();
+            }
+        }
+
+        public static void StopPolling()
+        {
+            IsPolling = false;
+        }
+    }
+
+
+    //see Thruster Layout google drawing files in Documentation folder
+    //https://drive.google.com/drive/u/1/folders/1kAhB2g80rjM9Hb7dXbg3HS3KL6_p3RJn
+    //actual class name of Layout Classes.
+    public class ThrusterLayout
+    {
+        public static readonly string TL1 = "ThrusterLayout1Connection";
+        public static readonly string TL2 = "ThrusterLayout2Connection";
+    }
+
+    public abstract class ConnectionContext
     {
         public ArduinoConnection connection;
-        private TcpClient client;
-        private NetworkStream stream;
+        protected TcpClient client;
+        protected NetworkStream stream;
 
-        public ConnectionContext(ArduinoConnection connection)
+        protected ConnectionContext(ArduinoConnection connection)
         {
             this.connection = connection;
         }
-
         public void Close()
         {
             if (isConnected())
@@ -89,21 +137,29 @@ namespace ROV2019.Presenters
             catch (Exception) { return (0, 0, 0, 0, 0, 0, 0); }
         }
 
-        public void Stop()
+        public bool SetThruster(Thrusters thruster, int value)
         {
-            if (isConnected())
+            try
             {
-                for (int i = 0; i < 6; i++)
+                ArduinoCommand command = new ArduinoCommand()
                 {
-                    SetThruster((Thrusters)Enum.Parse(typeof(Thrusters), i.ToString()), 1500);
-
-                }    
+                    Command = Command.SetThruster,
+                    NumberOfReturnedBytes = 0
+                };
+                command.AddParameter((int)thruster);
+                command.AddParameter(value);
+                {
+                    byte[] toWrite = command.GetCommandBytes();
+                    stream.Write(toWrite, 0, toWrite.Length);
+                    return true;
+                }
             }
+            catch (Exception) { return false; }
         }
 
         public string GetName()
         {
-            if(isConnected())
+            if (isConnected())
             {
                 try
                 {
@@ -118,7 +174,7 @@ namespace ROV2019.Presenters
                     stream.Read(toRead, 0, toRead.Length);
                     return ArduinoCommand.GetString(toRead);
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return "Failed To Get Name";
                 }
@@ -144,6 +200,32 @@ namespace ROV2019.Presenters
                 return (toRead[0] == 0x01);
             }
             catch (Exception) { return false; }
+        }
+
+        public abstract void Stop();
+        public abstract void MoveAndAddTrim(Dictionary<Thrusters, int> speeds);
+        //Add logic for PID here. Is Same as MoveAndAddTrim, but auto adjusts with PID
+        public abstract void VerticalStabilize(Dictionary<Thrusters, int> speeds);
+    }
+
+    //See thruster layout google drawings in the documentation folder. 
+    //https://drive.google.com/drive/u/1/folders/1kAhB2g80rjM9Hb7dXbg3HS3KL6_p3RJn
+    public class ThrusterLayout1Connection : ConnectionContext
+    {
+
+        public ThrusterLayout1Connection(ArduinoConnection connection) : base(connection)
+        { }
+
+        public override void Stop()
+        {
+            if (isConnected())
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    SetThruster((Thrusters)Enum.Parse(typeof(Thrusters), i.ToString()), 1500);
+
+                }    
+            }
         }
 
         public void MoveAndAddTrim(int VL, int VR, int FL, int FR, int BL, int BR)
@@ -192,6 +274,7 @@ namespace ROV2019.Presenters
             SetThruster(Thrusters.BackRight, BRPwr);
         }
 
+        [Obsolete("PID logic is no longer ran OnBoard")]
         public bool VerticalStabilize(int verticalLeftPwr, int verticalRightPwr)
         {
             try
@@ -212,24 +295,72 @@ namespace ROV2019.Presenters
             catch (Exception) { return false; }
         }
 
-        public bool SetThruster(Thrusters thruster, int value)
+        public override void MoveAndAddTrim(Dictionary<Thrusters, int> speeds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void VerticalStabilize(Dictionary<Thrusters, int> speeds)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ThrusterLayout2Connection : ConnectionContext
+    {
+
+        public ThrusterLayout2Connection(ArduinoConnection connection) : base(connection)
+        { }
+
+        public override void MoveAndAddTrim(Dictionary<Thrusters, int> speeds)
         {
             try
             {
-                ArduinoCommand command = new ArduinoCommand()
-                {
-                    Command = Command.SetThruster,
-                    NumberOfReturnedBytes = 0
-                };
-                command.AddParameter((int)thruster);
-                command.AddParameter(value);
-                {
-                    byte[] toWrite = command.GetCommandBytes();
-                    stream.Write(toWrite, 0, toWrite.Length);
-                    return true;
-                }
+                int L = speeds.FirstOrDefault(x => x.Key == Thrusters.FrontLeft).Value;
+                int R = speeds.FirstOrDefault(x => x.Key == Thrusters.FrontRight).Value;
+                int VFL = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalFrontLeft).Value;
+                int VFR = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalFrontRight).Value;
+                int VBL = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalBackLeft).Value;
+                int VBR = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalBackRight).Value;
+
+                L -= connection.Trim.LeftToRightCorrection;
+                R += connection.Trim.FrontToBackCorrection;
+
+                L = (L > 1500 ? Math.Min(L, 1900) : Math.Max(1100, L));
+                R = (R > 1500 ? Math.Min(R, 1900) : Math.Max(1100, R));
+                VFL = (VFL > 1500 ? Math.Min(VFL, 1900) : Math.Max(1100, VFL));
+                VFR = (VFR > 1500 ? Math.Min(VFR, 1900) : Math.Max(1100, VFR));
+                VBL = (VBL > 1500 ? Math.Min(VBL, 1900) : Math.Max(1100, VBL));
+                VBR = (VBR > 1500 ? Math.Min(VBR, 1900) : Math.Max(1100, VBR));
+
+                SetThruster(Thrusters.FrontLeft, L);
+                SetThruster(Thrusters.FrontRight, R);
+                SetThruster(Thrusters.VerticalFrontLeft, VFL);
+                SetThruster(Thrusters.VerticalFrontRight, VFR);
+                SetThruster(Thrusters.VerticalBackLeft, VBL);
+                SetThruster(Thrusters.VerticalBackRight, VBR);
+
             }
-            catch (Exception) { return false; }
+            catch(Exception e)
+            {
+                throw new Exception("Thruster Speed Is (most likely) Missing.", e);
+            }
+
+        }
+
+        public override void Stop()
+        {
+            SetThruster(Thrusters.FrontLeft, 1500);
+            SetThruster(Thrusters.FrontRight, 1500);
+            SetThruster(Thrusters.VerticalFrontLeft, 1500);
+            SetThruster(Thrusters.VerticalFrontRight, 1500);
+            SetThruster(Thrusters.VerticalBackLeft, 1500);
+            SetThruster(Thrusters.VerticalBackRight, 1500);
+        }
+
+        public override void VerticalStabilize(Dictionary<Thrusters, int> speeds)
+        {
+            throw new NotImplementedException();
         }
     }
 }

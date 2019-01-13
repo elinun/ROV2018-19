@@ -42,7 +42,7 @@ namespace ROV2019Tests
                 IpAddress = "10.108.114.65",
                 Port = 1741
             };
-            ConnectionContext conn = new ConnectionContext(connProperties);
+            ConnectionContext conn = new ConnectionManager().GetConnectionContext(connProperties);
             conn.OpenConnection();
             conn.SetThruster(Thrusters.FrontLeft, 1500);
         }
