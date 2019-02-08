@@ -51,6 +51,7 @@
     <Compile Include="ConnectionPresenters.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Thrusters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

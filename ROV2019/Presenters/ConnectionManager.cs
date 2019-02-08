@@ -69,6 +69,7 @@ namespace ROV2019.Presenters
                         IpAddress = firstThreeBytes + lastByte,
                         ConnectionClass = ThrusterLayout.TL2
                     };
+
                     ConnectionContext connection = GetConnectionContext(connectionProperties);
                     if (connection.OpenConnection(100))
                     {

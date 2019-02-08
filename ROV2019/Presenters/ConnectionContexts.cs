@@ -66,11 +66,12 @@ namespace ROV2019.Presenters
         }
         public void Close()
         {
-            if (isConnected())
+            try
             {
                 stream.Close();
                 client.Close();
             }
+            catch (Exception) { }
         }
 
         public bool OpenConnection(int timeout = 1000)
@@ -100,7 +101,7 @@ namespace ROV2019.Presenters
         {
             try
             {
-                stream.Write(ArduinoCommand.GetBytes(" "), 0, 1);
+                //stream.Write(ArduinoCommand.GetBytes(" "), 0, 1);
                 return true;
             }
             catch (Exception) { return false; }
@@ -154,7 +155,7 @@ namespace ROV2019.Presenters
                     return true;
                 }
             }
-            catch (Exception) { return false; }
+            catch (Exception e) { return false; }
         }
 
         public string GetName()
@@ -316,8 +317,8 @@ namespace ROV2019.Presenters
         {
             try
             {
-                int L = speeds.FirstOrDefault(x => x.Key == Thrusters.FrontLeft).Value;
-                int R = speeds.FirstOrDefault(x => x.Key == Thrusters.FrontRight).Value;
+                int L = speeds.FirstOrDefault(x => x.Key == Thrusters.Left).Value;
+                int R = speeds.FirstOrDefault(x => x.Key == Thrusters.Right).Value;
                 int VFL = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalFrontLeft).Value;
                 int VFR = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalFrontRight).Value;
                 int VBL = speeds.FirstOrDefault(x => x.Key == Thrusters.VerticalBackLeft).Value;
@@ -333,8 +334,8 @@ namespace ROV2019.Presenters
                 VBL = (VBL > 1500 ? Math.Min(VBL, 1900) : Math.Max(1100, VBL));
                 VBR = (VBR > 1500 ? Math.Min(VBR, 1900) : Math.Max(1100, VBR));
 
-                SetThruster(Thrusters.FrontLeft, L);
-                SetThruster(Thrusters.FrontRight, R);
+                SetThruster(Thrusters.Left, L);
+                SetThruster(Thrusters.Right, R);
                 SetThruster(Thrusters.VerticalFrontLeft, VFL);
                 SetThruster(Thrusters.VerticalFrontRight, VFR);
                 SetThruster(Thrusters.VerticalBackLeft, VBL);
@@ -350,8 +351,8 @@ namespace ROV2019.Presenters
 
         public override void Stop()
         {
-            SetThruster(Thrusters.FrontLeft, 1500);
-            SetThruster(Thrusters.FrontRight, 1500);
+            SetThruster(Thrusters.Left, 1500);
+            SetThruster(Thrusters.Right, 1500);
             SetThruster(Thrusters.VerticalFrontLeft, 1500);
             SetThruster(Thrusters.VerticalFrontRight, 1500);
             SetThruster(Thrusters.VerticalBackLeft, 1500);
@@ -360,7 +361,8 @@ namespace ROV2019.Presenters
 
         public override void VerticalStabilize(Dictionary<Thrusters, int> speeds)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            MoveAndAddTrim(speeds);
         }
     }
 }

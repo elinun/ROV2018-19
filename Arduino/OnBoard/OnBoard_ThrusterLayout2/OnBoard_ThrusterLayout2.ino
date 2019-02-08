@@ -118,7 +118,7 @@ void loop() {
 
 void pickCommand(EthernetClient client, String name, std::vector<String> params)
 {
-  Serial.println(name);
+  //Serial.println(name);
   if(name == "authorize")
   {
     if(params[0] == PASSWORD)
@@ -160,8 +160,8 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     int parameters[2];
     for(int i = 0; i<2;i++)
     {
-      char str[params[i].length()];
-      params[i].toCharArray(str, sizeof(str));
+      char str[params[i].length()+1];
+      params[i].toCharArray(str, params[i].length()+1);
       parameters[i] = atoi(str);
     }
     SetThruster(parameters[0], parameters[1]);
@@ -193,6 +193,7 @@ void SetThruster(int thruster, int msValue)
   switch(thruster)
   {
     case 0:
+      Serial.print("Left: "); Serial.println(msValue);
       FL.writeMicroseconds(msValue);
       break;
     case 1:

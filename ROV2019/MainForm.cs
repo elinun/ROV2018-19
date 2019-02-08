@@ -89,7 +89,7 @@ namespace ROV2019
                     }
                     catch (Exception) { IsOpen = false; };
                 }
-                Thread.Sleep(250);
+                Thread.Sleep(100);
             }
         }
 
@@ -309,14 +309,8 @@ namespace ROV2019
         private void AddControllerButton_Click(object sender, EventArgs e)
         {
             //TODO: Show add controller dialog.
-            ControllerInfo newController = new ControllerInfo()
-            {
-                FriendlyName = "Testing",
-                ControllerClass = "PlayStation",
-                ConfigurationClass = typeof(Arcade).Name,
-                Type = ControllerType.SlimDX
-            };
-            ControllerManager.Add(newController);
+            AddControllerForm dialog = new AddControllerForm(ControllerManager);
+            dialog.ShowDialog();
             PopulateControllersList();
         }
 

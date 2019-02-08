@@ -34,17 +34,5 @@ namespace ROV2019Tests
             Debug.WriteLine(results[0].IpAddress);
         }*/
 
-        [TestMethod]
-        public void RunThruster()
-        {
-            ArduinoConnection connProperties = new ArduinoConnection
-            {
-                IpAddress = "10.108.114.65",
-                Port = 1741
-            };
-            ConnectionContext conn = new ConnectionManager().GetConnectionContext(connProperties);
-            conn.OpenConnection();
-            conn.SetThruster(Thrusters.FrontLeft, 1500);
-        }
     }
 }

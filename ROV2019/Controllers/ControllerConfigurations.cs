@@ -162,12 +162,33 @@ namespace ROV2019.ControllerConfigurations
         public override ConfiguredPollData Poll()
         {
             //TODO: Implement configuration
-
+            controller.Poll();
             //TODO: Add logic to move straight forward when tilted (pitched).
+            int L = 1500 + controller.X + controller.Y;
+            int R = 1500 + controller.X - controller.Y;
+            int VFL = 1500 + controller.RotationZ + controller.Z;
+            int VFR = 1500 + controller.RotationZ - controller.Z;
+            int VBL = 1500 - controller.RotationZ + controller.Z;
+            int VBR = 1500 - controller.RotationZ - controller.Z;
+
+            L = L > 0 ? Math.Min(L, 1900) : Math.Max(1100, L);
+            R = R > 0 ? Math.Min(R, 1900) : Math.Max(1100, R);
+            VFL = VFL > 0 ? Math.Min(VFL, 1900) : Math.Max(1100, VFL);
+            VBL = VBL > 0 ? Math.Min(VBL, 1900) : Math.Max(1100, VBL);
+            VBR = VBR > 0 ? Math.Min(VBR, 1900) : Math.Max(1100, VBR);
+            VFR = VFR > 0 ? Math.Min(VFR, 1900) : Math.Max(1100, VFR);
+
+            Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
+            thrusterSpeeds.Add(Thrusters.Left, L);
+            thrusterSpeeds.Add(Thrusters.Right, R);
+            thrusterSpeeds.Add(Thrusters.VerticalFrontLeft, VFL);
+            thrusterSpeeds.Add(Thrusters.VerticalFrontRight, VFR);
+            thrusterSpeeds.Add(Thrusters.VerticalBackLeft, VBL);
+            thrusterSpeeds.Add(Thrusters.VerticalBackRight, VBR);
 
             ConfiguredPollData data = new ConfiguredPollData()
             {
-
+                ThrusterSpeeds = thrusterSpeeds
             };
             return data;
         }

@@ -82,8 +82,8 @@ namespace ROV2019.Models
 
     public enum Thrusters
     {
-        FrontLeft = 0,
-        FrontRight = 1,
+        Left = 0,
+        Right = 1,
         [Obsolete]
         BackLeft = 2,
         [Obsolete]
@@ -97,6 +97,8 @@ namespace ROV2019.Models
         VerticalFrontLeft = 6,
         VerticalFrontRight = 7,
         VerticalBackLeft = 8,
-        VerticalBackRight = 9
+        VerticalBackRight = 9,
+        FrontLeft = 10,
+        FrontRight = 11
     }
 }

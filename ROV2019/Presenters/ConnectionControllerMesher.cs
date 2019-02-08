@@ -18,7 +18,7 @@ namespace ROV2019.Presenters
         public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 15)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 50)
         {
             conn = connection;
             config = configuration;
