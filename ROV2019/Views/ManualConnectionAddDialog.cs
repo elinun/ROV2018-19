@@ -43,7 +43,8 @@ namespace ROV2019.Views
                 FriendlyName = nameField.Text,
                 IpAddress = IPField.Text,
                 Port = (int)PortField.Value,
-                Password = PasswordField.Text
+                Password = PasswordField.Text,
+                ConnectionClass = ThrusterLayout.TL2
             };
             connectionManager.Add(conn);
             Close();

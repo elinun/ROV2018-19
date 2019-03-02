@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ROV2019.Presenters
 {
-    class ControllerManager
+    public class ControllerManager
     {
         public List<ControllerInfo> SavedControllers { get; private set; }
 

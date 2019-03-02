@@ -55,6 +55,12 @@
     <Compile Include="Controllers\PlayStation.cs" />
     <Compile Include="Presenters\ConnectionControllerMesher.cs" />
     <Compile Include="Presenters\ControllerManager.cs" />
+    <Compile Include="Views\AddControllerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AddControllerForm.Designer.cs">
+      <DependentUpon>AddControllerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\AttitudeIndicatorInstrumentControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -86,7 +92,7 @@
     <Compile Include="Models\ArduinoCommand.cs" />
     <Compile Include="Models\ArduinoConnection.cs" />
     <Compile Include="Models\ControllerInfo.cs" />
-    <Compile Include="Presenters\ConnectionContext.cs" />
+    <Compile Include="Presenters\ConnectionContexts.cs" />
     <Compile Include="Presenters\ConnectionManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -96,6 +102,9 @@
     <Compile Include="Views\TrimConfigurationDialog.Designer.cs">
       <DependentUpon>TrimConfigurationDialog.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Views\AddControllerForm.resx">
+      <DependentUpon>AddControllerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\ConnectionScanProgressDialog.resx">
       <DependentUpon>ConnectionScanProgressDialog.cs</DependentUpon>
     </EmbeddedResource>

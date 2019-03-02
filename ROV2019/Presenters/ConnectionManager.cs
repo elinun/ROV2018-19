@@ -26,6 +26,11 @@ namespace ROV2019.Presenters
             SavedConnections = Properties.Settings.Default.SavedConnections.connections;
         }
 
+        public ConnectionContext GetConnectionContext(ArduinoConnection connection)
+        {
+            return (ConnectionContext)System.Reflection.Assembly.GetExecutingAssembly().CreateInstance("ROV2019.Presenters." + connection.ConnectionClass, true, System.Reflection.BindingFlags.CreateInstance, null, new object[] { connection }, null, null);
+        }
+
         public async Task<List<ArduinoConnection>> Scan(IProgress<(ArduinoConnection, int)> progress)
         {
             if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
@@ -61,9 +66,11 @@ namespace ROV2019.Presenters
                     ArduinoConnection connectionProperties = new ArduinoConnection()
                     {
                         Port = port,
-                        IpAddress = firstThreeBytes + lastByte
+                        IpAddress = firstThreeBytes + lastByte,
+                        ConnectionClass = ThrusterLayout.TL2
                     };
-                    ConnectionContext connection = new ConnectionContext(connectionProperties);
+
+                    ConnectionContext connection = GetConnectionContext(connectionProperties);
                     if (connection.OpenConnection(100))
                     {
                         connectionProperties.FriendlyName = connection.GetName();

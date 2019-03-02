@@ -18,7 +18,7 @@ namespace ROV2019.Presenters
         public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 15)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 50)
         {
             conn = connection;
             config = configuration;
@@ -37,27 +37,14 @@ namespace ROV2019.Presenters
 
         private void Poll()
         {
-            while(IsMeshing)
+            while (IsMeshing)
             {
                 ConfiguredPollData data = config.Poll();
-                int VL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.VerticalLeft).Value;
-                int VR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.VerticalRight).Value;
-                int FL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.FrontLeft).Value;
-                int FR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.FrontRight).Value;
-                int BL = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.BackLeft).Value;
-                int BR = data.ThrusterSpeeds.FirstOrDefault(x => x.Key == Thrusters.BackRight).Value;
-
-                if (IsUsingPID)
-                {
-                    //Is Using PID has turned into VerticalStabilize
-                    conn.VerticalStabilize(VL, VR);
-                    conn.MoveAndAddTrim(FL, FR, BL, BR);
-                    //add servo code later
-                }
+                if (!IsUsingPID)
+                    conn.MoveAndAddTrim(data.ThrusterSpeeds);
                 else
-                {
-                    conn.MoveAndAddTrim(VL, VR, FL, FR, BR, BL);
-                }
+                    conn.VerticalStabilize(data.ThrusterSpeeds);
+                //Add servos later
                 Thread.Sleep(PollInterval);
             }
         }

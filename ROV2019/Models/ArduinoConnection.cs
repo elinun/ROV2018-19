@@ -19,6 +19,8 @@ namespace ROV2019.Models
         public string Password { get; set; }
         public string FriendlyName { get; set; }
         public int Latency { get; set; }
+        //See ConnectionClass class
+        public string ConnectionClass { get; set; }
         public Trim Trim { get; set; } = new Trim();
     }
 
@@ -29,5 +31,6 @@ namespace ROV2019.Models
         //How much it drifts front to back when moving side to side
         public int FrontToBackCorrection { get; set; }
         public int RollCorrection { get; set; }
+        public int PitchCorrection { get; set; }
     }
 }

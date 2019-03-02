@@ -75,17 +75,30 @@ namespace ROV2019.Models
         public static readonly string SetThruster = "SetThruster";
         public static readonly string AnalogRead = "analogRead";
         public static readonly string GetName = "GetName";
+        [Obsolete]
         public static readonly string VerticalStabilize = "VerticalStabilize";
         public static readonly string GetAccelerations = "GetAccelerations";
     }
 
     public enum Thrusters
     {
-        FrontLeft = 0,
-        FrontRight = 1,
+        Left = 0,
+        Right = 1,
+        [Obsolete]
         BackLeft = 2,
+        [Obsolete]
         BackRight = 3,
+        //these will only be used when we have two vertical thrusters
+        [Obsolete]
         VerticalLeft = 4,
-        VerticalRight = 5
+        [Obsolete]
+        VerticalRight = 5,
+        //these four will only be used in thruster configurations with for vertical thrusters
+        VerticalFrontLeft = 6,
+        VerticalFrontRight = 7,
+        VerticalBackLeft = 8,
+        VerticalBackRight = 9,
+        FrontLeft = 10,
+        FrontRight = 11
     }
 }
