@@ -2,10 +2,9 @@
 #include<Servo.h>
 #include<Wire.h>
 #include<Ethernet.h>
-#include<PID_v1.h>
 #include <stdio.h>
 
-#define PASSWORD "password" //change this to actual password
+#define PASSWORD "password" //change this to the actual password
 #define ROV_NAME "Innovocean X" //16 character max, please
 
 const int MPU_addr=0x68; 
@@ -13,7 +12,8 @@ const int MPU_addr=0x68;
 bool Authorized = false;
 
 //Thrusters Left, Right, VerticalFrontLeft...
-Servo FL, FR, VFL, VFR, VBL, VBR;
+Servo FL, FR, VFL, VFR, VBL, VBR, ClawOpen, ClawRotate;
+int ClawOpenPos, ClawRotatePos = 45;
 
 EthernetServer server = EthernetServer(1740);
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  
@@ -46,7 +46,8 @@ void setup() {
   
   
   //Setup servos
-
+  ClawOpen.attach(11);
+  ClawRotate.attach(12);
   //Setup anything else
   
   //Start Server
@@ -65,6 +66,18 @@ void setup() {
   Stop();  
 }
 
+void UpdateServoPositions()
+{
+  if(ClawOpenPos>0 && ClawOpenPos<180)
+  {
+    ClawOpen.write(ClawOpenPos);
+  }
+  if(ClawRotatePos>0 && ClawRotatePos<180)
+  {
+    ClawRotate.write(ClawRotatePos);
+  }
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
   EthernetClient client = server.available();
@@ -73,6 +86,7 @@ void loop() {
     Serial.println("Client Connected.");
     while(client.connected())
     {
+      UpdateServoPositions();
       if(client.available())
       {
         //parse command from client stream
@@ -165,6 +179,33 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       parameters[i] = atoi(str);
     }
     SetThruster(parameters[0], parameters[1]);
+  }
+  else if(name == "setServoSpeed" && Authorized)
+  {
+    int parameters[2];
+    for(int i = 0; i<2;i++)
+    {
+      char str[params[i].length()+1];
+      params[i].toCharArray(str, params[i].length()+1);
+      parameters[i] = atoi(str);
+    }
+
+    switch(parameters[0])
+    {
+        case 0:
+          ClawOpenPos += parameters[1];
+          break;
+        case 1:
+          ClawRotatePos += parameters[1];
+          break;
+    }
+  }
+  else if(name == "analogRead" && Authorized)
+  {
+      char str[params[0].length()+1];
+      params[0].toCharArray(str, params[0].length()+1);
+      int pin = atoi(str);
+      client.println(analogRead(pin));
   }
 }
 
