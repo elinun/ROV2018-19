@@ -344,7 +344,7 @@ namespace ROV2019.Presenters
             }
             catch(Exception e)
             {
-                throw new Exception("Thruster Speed Is (most likely) Missing.", e);
+                //throw new Exception("Thruster Speed Is (most likely) Missing.", e);
             }
 
         }

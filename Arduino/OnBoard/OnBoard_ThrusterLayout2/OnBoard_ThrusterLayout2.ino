@@ -193,7 +193,7 @@ void SetThruster(int thruster, int msValue)
   switch(thruster)
   {
     case 0:
-      Serial.print("Left: "); Serial.println(msValue);
+      //Serial.print("Left: "); Serial.println(msValue);
       FL.writeMicroseconds(msValue);
       break;
     case 1:
@@ -219,6 +219,7 @@ void SetThruster(int thruster, int msValue)
       break;
     case 7:
       VFR.writeMicroseconds(msValue);
+      break;
     case 8:
       VBL.writeMicroseconds(msValue);
       break;

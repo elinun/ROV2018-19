@@ -20,7 +20,7 @@ namespace ROV2019Tests
             var manager = new ConnectionManager();
             var connectionInfo = new ArduinoConnection()
             {
-                IpAddress = "192.168.1.244",
+                IpAddress = "192.168.1.146",
                 Port = 1740,
                 Password = "password",
                 ConnectionClass = "ThrusterLayout2Connection"
@@ -33,8 +33,9 @@ namespace ROV2019Tests
         [TestMethod]
         public void RunLeft_Thruster()
         {
-            connection.SetThruster(ROV2019.Models.Thrusters.Left, 1700);
-            Thread.Sleep(1500);
+            connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontRight, 1575);
+            //connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontRight, 1600);
+            Thread.Sleep(1000);
             connection.Stop();
             connection.Close();
         }
