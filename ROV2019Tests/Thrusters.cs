@@ -33,8 +33,8 @@ namespace ROV2019Tests
         [TestMethod]
         public void RunLeft_Thruster()
         {
-            connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontRight, 1575);
-            //connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontRight, 1600);
+            connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontRight, 1600);
+            connection.SetThruster(ROV2019.Models.Thrusters.VerticalFrontLeft, 1600);
             Thread.Sleep(1000);
             connection.Stop();
             connection.Close();

@@ -55,7 +55,7 @@ namespace ROV2019.ControllerConfigurations
 
             //try to prevent swapping directions on the thrusters,
             int verticalSpeed = 0;
-            if(canVerticalMove)
+            if (canVerticalMove)
             {
                 verticalSpeed = (controller.RotationX > 0 ? -controller.RotationX : controller.RotationY);
             }
@@ -64,7 +64,7 @@ namespace ROV2019.ControllerConfigurations
             previousUp = controller.Buttons[7];
 
             rollSpeed -= (controller.Buttons[4] && rollSpeed > -250 ? 1 : 0);
-            rollSpeed += (controller.Buttons[5]  && rollSpeed < 250? 1 : 0);
+            rollSpeed += (controller.Buttons[5] && rollSpeed < 250 ? 1 : 0);
 
             Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
 
@@ -151,6 +151,18 @@ namespace ROV2019.ControllerConfigurations
 
     public class Helicopter : ControllerConfiguration
     {
+        Dictionary<Thrusters, int> prevVals = new Dictionary<Thrusters, int>()
+        {
+            {Thrusters.Left, 1500 },
+            {Thrusters.Right, 1500 },
+            {Thrusters.VerticalBackLeft, 1500 },
+            { Thrusters.VerticalBackRight, 1500 },
+            {Thrusters.VerticalFrontLeft, 1500 },
+            {Thrusters.VerticalFrontRight, 1500 }
+        };
+        long prevTime = DateTime.Now.Ticks;
+        //Units of microseconds pulse/elapsed milliseconds
+        readonly int maxRateOfChange = 1;
         Controller controller;
         public Helicopter(Controller c) : base(c)
         {
@@ -178,6 +190,9 @@ namespace ROV2019.ControllerConfigurations
             VBR = VBR > 0 ? Math.Min(VBR, 1900) : Math.Max(1100, VBR);
             VFR = VFR > 0 ? Math.Min(VFR, 1900) : Math.Max(1100, VFR);
 
+            //Optional after we add the separate regulator for arduino
+            CheckRateOfChange(ref L, ref R, ref VFL, ref VFR, ref VBL, ref VBR);
+
             Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
             thrusterSpeeds.Add(Thrusters.Left, L);
             thrusterSpeeds.Add(Thrusters.Right, R);
@@ -191,6 +206,37 @@ namespace ROV2019.ControllerConfigurations
                 ThrusterSpeeds = thrusterSpeeds
             };
             return data;
+        }
+
+        //Makes sure that the thrusters are not speeding up too fast in order to prevent voltage drop.
+        private void CheckRateOfChange(ref int Left, ref int Right, ref int vfl, ref int vfr, ref int vbl, ref int vbr)
+        {
+            int elapsedMs = (int)(DateTime.Now.Ticks - prevTime);
+            int prevLeft = prevVals[Thrusters.Left];
+            Left = ((Left - prevLeft) / elapsedMs <= maxRateOfChange) ? Left : prevLeft + (maxRateOfChange*elapsedMs);
+            prevVals[Thrusters.Left] = Left;
+
+            int prevRight = prevVals[Thrusters.Right];
+            Right = ((Right - prevRight) / elapsedMs <= maxRateOfChange) ? Right : prevRight + (maxRateOfChange * elapsedMs);
+            prevVals[Thrusters.Right] = Right;
+
+            int prevvfl = prevVals[Thrusters.VerticalFrontLeft];
+            vfl = ((vfl - prevvfl) / elapsedMs <= maxRateOfChange) ? vfl : prevvfl + (maxRateOfChange * elapsedMs);
+            prevVals[Thrusters.VerticalFrontLeft] = vfl;
+
+            int prevvfr = prevVals[Thrusters.VerticalFrontRight];
+            vfr = ((vfr - prevvfr) / elapsedMs <= maxRateOfChange) ? vfr : prevvfr + (maxRateOfChange * elapsedMs);
+            prevVals[Thrusters.VerticalFrontRight] = vfr;
+
+            int prevvbl = prevVals[Thrusters.VerticalBackLeft];
+            vbl = ((vbl - prevvbl) / elapsedMs <= maxRateOfChange) ? vbl : prevvbl + (maxRateOfChange * elapsedMs);
+            prevVals[Thrusters.VerticalBackLeft] = vbl;
+
+            int prevvbr = prevVals[Thrusters.VerticalBackRight];
+            vbr = ((vbr - prevvbr) / elapsedMs <= maxRateOfChange) ? vbr : prevvbr + (maxRateOfChange * elapsedMs);
+            prevVals[Thrusters.VerticalBackRight] = vbr;
+
+            prevTime = DateTime.Now.Ticks;
         }
     }
 }

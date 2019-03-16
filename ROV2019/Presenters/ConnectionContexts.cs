@@ -155,7 +155,7 @@ namespace ROV2019.Presenters
                     return true;
                 }
             }
-            catch (Exception e) { return false; }
+            catch (Exception) { return false; }
         }
 
         public string GetName()
