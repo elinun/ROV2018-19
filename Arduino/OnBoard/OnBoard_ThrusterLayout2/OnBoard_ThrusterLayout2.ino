@@ -123,6 +123,7 @@ void loop() {
           pickCommand(client, commandName, parameters);
           
       }
+      delay(1);
     }
     Stop();
     Authorized = false;

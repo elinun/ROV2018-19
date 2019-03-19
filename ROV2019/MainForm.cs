@@ -303,7 +303,11 @@ namespace ROV2019
 
         private void SensorButton_Click(object sender, EventArgs e)
         {
-            //TODO: Open Dialog with senor data.
+            if(openConnection != null)
+            {
+                SensorsDialog dialog = new SensorsDialog(openConnection);
+                dialog.Show();
+            }
         }
 
         private void AddControllerButton_Click(object sender, EventArgs e)
