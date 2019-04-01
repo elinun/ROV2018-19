@@ -55,6 +55,7 @@
     <Compile Include="Controllers\PlayStation.cs" />
     <Compile Include="Presenters\ConnectionControllerMesher.cs" />
     <Compile Include="Presenters\ControllerManager.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="Views\AddControllerForm.cs">
       <SubType>Form</SubType>
     </Compile>

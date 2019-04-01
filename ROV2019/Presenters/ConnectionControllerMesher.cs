@@ -18,7 +18,7 @@ namespace ROV2019.Presenters
         public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 50)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 350)
         {
             conn = connection;
             config = configuration;
@@ -44,7 +44,27 @@ namespace ROV2019.Presenters
                     conn.MoveAndAddTrim(data.ThrusterSpeeds);
                 else
                     conn.VerticalStabilize(data.ThrusterSpeeds);
-                //Add servos later
+
+                //Servos
+                int? openSpeed;
+                int? rotateSpeed;
+                if((openSpeed = Utilities.TryGet((int)Servos.ClawOpen, data.ServoSpeeds)) != null)
+                {
+                    conn.SetServoSpeed(Servos.ClawOpen, (int)openSpeed);
+                }
+
+                if ((rotateSpeed = Utilities.TryGet((int)Servos.ClawRotate, data.ServoSpeeds)) != null)
+                    conn.SetServoSpeed(Servos.ClawRotate, (int)rotateSpeed);
+
+                //Accessories
+                bool? GoGoOn;
+                bool? WinderOn;
+                if ((GoGoOn = Utilities.TryGet((int)Accessories.GoGoMotor, data.Accessories)) != null)
+                    conn.DigitalWrite((int)Accessories.GoGoMotor, (bool)GoGoOn);
+
+                if ((WinderOn = Utilities.TryGet((int)Accessories.TetherWinder, data.Accessories)) != null)
+                    conn.DigitalWrite((int)Accessories.TetherWinder, (bool)WinderOn);
+
                 Thread.Sleep(PollInterval);
             }
         }

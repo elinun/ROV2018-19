@@ -143,7 +143,7 @@ namespace ROV2019.ControllerConfigurations
             ConfiguredPollData data = new ConfiguredPollData()
             {
                 ThrusterSpeeds = thrusterSpeeds,
-                ServoSpeeds = new Dictionary<int, int>()
+                ServoSpeeds = new Dictionary<int, int?>()
             };
             return data;
         }
@@ -163,6 +163,13 @@ namespace ROV2019.ControllerConfigurations
         long prevTime = DateTime.Now.Ticks;
         //Units of microseconds pulse/elapsed milliseconds
         readonly int maxRateOfChange = 1;
+
+        int prevClawOpenSpeed = 0;
+        int prevClawRotateSpeed = 0;
+
+        bool goGoMotorPreviouslyOn = false;
+        bool tetherWinderPreviouslyOn = false;
+
         Controller controller;
         public Helicopter(Controller c) : base(c)
         {
@@ -201,9 +208,93 @@ namespace ROV2019.ControllerConfigurations
             thrusterSpeeds.Add(Thrusters.VerticalBackLeft, VBL);
             thrusterSpeeds.Add(Thrusters.VerticalBackRight, VBR);
 
+            //Servos and Micro
+            Dictionary<int, bool?> accessories = new Dictionary<int, bool?>();
+            if (controller.Buttons[5])
+            {
+                if(!goGoMotorPreviouslyOn)
+                    accessories[(int)Accessories.GoGoMotor] = true;
+            }
+            else if(goGoMotorPreviouslyOn)
+            {
+                accessories[(int)Accessories.GoGoMotor] = false;
+            }
+            goGoMotorPreviouslyOn = controller.Buttons[5];
+
+            if (controller.Buttons[4])
+            {
+                if (!tetherWinderPreviouslyOn)
+                    accessories[(int)Accessories.TetherWinder] = true;
+            }
+            else if (tetherWinderPreviouslyOn)
+            {
+                accessories[(int)Accessories.TetherWinder] = false;
+            }
+            tetherWinderPreviouslyOn = controller.Buttons[4];
+
+            Dictionary<int, int?> servoSpeeds = new Dictionary<int, int?>();
+            if(controller.Buttons[0])
+            {
+                if (prevClawOpenSpeed >= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawOpen] = -1;
+                    prevClawOpenSpeed = -1;
+                }
+                    
+            }
+            else if(prevClawOpenSpeed<0)
+            {
+                servoSpeeds[(int)Servos.ClawOpen] = 0;
+                prevClawOpenSpeed = 0;
+            }
+
+            if (controller.Buttons[2])
+            {
+                if (prevClawOpenSpeed <= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawOpen] = 1;
+                    prevClawOpenSpeed = 1;
+                }
+            }
+            else if (prevClawOpenSpeed > 0)
+            {
+                servoSpeeds[(int)Servos.ClawOpen] = 0;
+                prevClawOpenSpeed = 0;
+            }
+
+            if (controller.Buttons[1])
+            {
+                if (prevClawRotateSpeed >= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawRotate] = -1;
+                    prevClawRotateSpeed = -1;
+                }
+            }
+            else if (prevClawRotateSpeed < 0)
+            {
+                servoSpeeds[(int)Servos.ClawRotate] = 0;
+                prevClawRotateSpeed = 0;
+            }
+
+            if (controller.Buttons[3])
+            {
+                if (prevClawRotateSpeed <= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawRotate] = 1;
+                    prevClawRotateSpeed = 1;
+                }
+            }
+            else if (prevClawRotateSpeed > 0)
+            {
+                servoSpeeds[(int)Servos.ClawRotate] = 0;
+                prevClawRotateSpeed = 0;
+            }
+
             ConfiguredPollData data = new ConfiguredPollData()
             {
-                ThrusterSpeeds = thrusterSpeeds
+                ThrusterSpeeds = thrusterSpeeds,
+                Accessories = accessories,
+                ServoSpeeds = servoSpeeds
             };
             return data;
         }

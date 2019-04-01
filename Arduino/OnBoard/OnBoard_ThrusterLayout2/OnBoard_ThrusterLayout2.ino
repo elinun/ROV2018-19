@@ -14,6 +14,7 @@ bool Authorized = false;
 //Thrusters Left, Right, VerticalFrontLeft...
 Servo FL, FR, VFL, VFR, VBL, VBR, ClawOpen, ClawRotate;
 int ClawOpenPos, ClawRotatePos = 45;
+int ClawOpenSpeed, ClawRotateSpeed = 0;
 
 EthernetServer server = EthernetServer(1740);
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  
@@ -44,6 +45,8 @@ void setup() {
   Wire.write((byte)16);
   Wire.endTransmission(true);
   
+  //Setup the pin to turn on the relay for the MicroROV
+  pinMode(A0, OUTPUT);
   
   //Setup servos
   ClawOpen.attach(11);
@@ -68,6 +71,8 @@ void setup() {
 
 void UpdateServoPositions()
 {
+  ClawOpenPos += ClawOpenSpeed;
+  ClawRotatePos += ClawRotateSpeed;
   if(ClawOpenPos>0 && ClawOpenPos<180)
   {
     ClawOpen.write(ClawOpenPos);
@@ -194,10 +199,10 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
     switch(parameters[0])
     {
         case 0:
-          ClawOpenPos += parameters[1];
+          ClawOpenSpeed = parameters[1];
           break;
         case 1:
-          ClawRotatePos += parameters[1];
+          ClawRotateSpeed = parameters[1];
           break;
     }
   }
@@ -207,6 +212,17 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       params[0].toCharArray(str, params[0].length()+1);
       int pin = atoi(str);
       client.println(analogRead(pin));
+  }
+  else if(name == "digitalWrite" && Authorized)
+  {
+    int parameters[2];
+    for(int i = 0; i<2;i++)
+    {
+      char str[params[i].length()+1];
+      params[i].toCharArray(str, params[i].length()+1);
+      parameters[i] = atoi(str);
+    }
+    digitalWrite(parameters[0], parameters[1]);
   }
 }
 

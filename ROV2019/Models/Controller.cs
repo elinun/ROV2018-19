@@ -138,7 +138,8 @@ namespace ROV2019.Models
         [System.Obsolete("Use ThrusterSpeeds instead")]
         public (int forwardSpeed, int lateralSpeed, int rotationalSpeed, int verticalSpeed, int rollSpeed) Vectors { get; set; }
         public Dictionary<Thrusters, int> ThrusterSpeeds { get; set; }
-        public Dictionary<int, int> ServoSpeeds { get; set; }
-        //add acessories later
+        //for ServoSpeeds and accessories, null will indicate no change
+        public Dictionary<int, int?> ServoSpeeds { get; set; }
+        public Dictionary<int, bool?> Accessories { get; set; }
     }
 }

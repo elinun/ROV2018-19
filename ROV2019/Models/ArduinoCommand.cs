@@ -78,6 +78,8 @@ namespace ROV2019.Models
         [Obsolete]
         public static readonly string VerticalStabilize = "VerticalStabilize";
         public static readonly string GetAccelerations = "GetAccelerations";
+        internal static readonly string SetServoSpeed = "setServoSpeed";
+        internal static readonly string DigitalWrite = "digitalWrite";
     }
 
     public enum Thrusters
@@ -100,5 +102,17 @@ namespace ROV2019.Models
         VerticalBackRight = 9,
         FrontLeft = 10,
         FrontRight = 11
+    }
+
+    public enum Servos
+    {
+        ClawOpen = 0,
+        ClawRotate = 1
+    }
+
+    public enum Accessories
+    {
+        GoGoMotor = 1,
+        TetherWinder = 9
     }
 }

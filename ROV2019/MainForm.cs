@@ -259,7 +259,7 @@ namespace ROV2019
                     }
                     //TODO: Refactor maybe
                     button.Text = "Disconnect";
-                    Accelerations.StartPolling(openConnection);
+                    //Accelerations.StartPolling(openConnection);
                     setConnectionListItemDisplayConnected(true);
                     //start mesh if controller available
                     if(SelectedController != null && ControllerManager.IsControllerConnected(SelectedController))

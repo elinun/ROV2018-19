@@ -151,7 +151,7 @@ namespace ROV2019.Presenters
                 command.AddParameter(value);
                 {
                     byte[] toWrite = command.GetCommandBytes();
-                    stream.Write(toWrite, 0, toWrite.Length);
+                    //stream.Write(toWrite, 0, toWrite.Length);
                     return true;
                 }
             }
@@ -199,6 +199,45 @@ namespace ROV2019.Presenters
                 byte[] toRead = new byte[1];
                 stream.Read(toRead, 0, toRead.Length);
                 return (toRead[0] == 0x01);
+            }
+            catch (Exception) { return false; }
+        }
+
+        public bool SetServoSpeed(Servos servo, int speed)
+        {
+            ArduinoCommand cmd = new ArduinoCommand()
+            {
+                Command = Command.SetServoSpeed,
+                NumberOfReturnedBytes = 0
+            };
+            cmd.AddParameter((int)servo);
+            cmd.AddParameter(speed);
+            try
+            {
+                byte[] toWrite = cmd.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool DigitalWrite(int pin, bool on)
+        {
+            try
+            {
+                ArduinoCommand cmd = new ArduinoCommand()
+                {
+                    Command = Command.DigitalWrite,
+                    NumberOfReturnedBytes = 0
+                };
+                cmd.AddParameter(pin);
+                cmd.AddParameter(on ? 1: 0);
+                byte[] toWrite = cmd.GetCommandBytes();
+                stream.Write(toWrite, 0, toWrite.Length);
+                return true;
             }
             catch (Exception) { return false; }
         }
@@ -305,6 +344,7 @@ namespace ROV2019.Presenters
         {
             throw new NotImplementedException();
         }
+
     }
 
     public class ThrusterLayout2Connection : ConnectionContext
@@ -329,13 +369,14 @@ namespace ROV2019.Presenters
 
                 //Check for inversions
                 Dictionary<Thrusters, bool> inversions = connection.Trim.InvertedThrusters;
-                L = TryGet(Thrusters.Left, inversions) ? 3000 - L : L;
-                R = TryGet(Thrusters.Right, inversions) ? 3000 - R : R;
-                VFL = TryGet(Thrusters.VerticalFrontLeft, inversions) ? 3000 - VFL : VFL;
-                VBL = TryGet(Thrusters.VerticalBackLeft, inversions) ? 3000 - VBL : VBL;
-                VBR = TryGet(Thrusters.VerticalBackRight, inversions) ? 3000 - VBR : VBR;
-                VFR = TryGet(Thrusters.VerticalFrontRight, inversions) ? 3000 - VFR : VFR;
+                L = Utilities.TryGet(Thrusters.Left, inversions) ? 3000 - L : L;
+                R = Utilities.TryGet(Thrusters.Right, inversions) ? 3000 - R : R;
+                VFL = Utilities.TryGet(Thrusters.VerticalFrontLeft, inversions) ? 3000 - VFL : VFL;
+                VBL = Utilities.TryGet(Thrusters.VerticalBackLeft, inversions) ? 3000 - VBL : VBL;
+                VBR = Utilities.TryGet(Thrusters.VerticalBackRight, inversions) ? 3000 - VBR : VBR;
+                VFR = Utilities.TryGet(Thrusters.VerticalFrontRight, inversions) ? 3000 - VFR : VFR;
 
+                //Make sure we don't go over or under the signal range
                 L = (L > 1500 ? Math.Min(L, 1900) : Math.Max(1100, L));
                 R = (R > 1500 ? Math.Min(R, 1900) : Math.Max(1100, R));
                 VFL = (VFL > 1500 ? Math.Min(VFL, 1900) : Math.Max(1100, VFL));
@@ -358,12 +399,7 @@ namespace ROV2019.Presenters
 
         }
 
-        private TValue TryGet<Tkey, TValue>(Tkey key, Dictionary<Tkey, TValue> values)
-        {
-            values.TryGetValue(key, out TValue ret);
-            return ret;
-        }
-
+        
         public override void Stop()
         {
             SetThruster(Thrusters.Left, 1500);
@@ -379,5 +415,6 @@ namespace ROV2019.Presenters
             //throw new NotImplementedException();
             MoveAndAddTrim(speeds);
         }
+
     }
 }
