@@ -191,7 +191,7 @@ namespace ROV2019.ControllerConfigurations
             VFR = VFR > 0 ? Math.Min(VFR, 1900) : Math.Max(1100, VFR);
 
             //Optional after we add the separate regulator for arduino
-            CheckRateOfChange(ref L, ref R, ref VFL, ref VFR, ref VBL, ref VBR);
+            //CheckRateOfChange(ref L, ref R, ref VFL, ref VFR, ref VBL, ref VBR);
 
             Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
             thrusterSpeeds.Add(Thrusters.Left, L);

@@ -327,6 +327,15 @@ namespace ROV2019.Presenters
                 L -= connection.Trim.LeftToRightCorrection;
                 R += connection.Trim.FrontToBackCorrection;
 
+                //Check for inversions
+                Dictionary<Thrusters, bool> inversions = connection.Trim.InvertedThrusters;
+                L = TryGet(Thrusters.Left, inversions) ? 3000 - L : L;
+                R = TryGet(Thrusters.Right, inversions) ? 3000 - R : R;
+                VFL = TryGet(Thrusters.VerticalFrontLeft, inversions) ? 3000 - VFL : VFL;
+                VBL = TryGet(Thrusters.VerticalBackLeft, inversions) ? 3000 - VBL : VBL;
+                VBR = TryGet(Thrusters.VerticalBackRight, inversions) ? 3000 - VBR : VBR;
+                VFR = TryGet(Thrusters.VerticalFrontRight, inversions) ? 3000 - VFR : VFR;
+
                 L = (L > 1500 ? Math.Min(L, 1900) : Math.Max(1100, L));
                 R = (R > 1500 ? Math.Min(R, 1900) : Math.Max(1100, R));
                 VFL = (VFL > 1500 ? Math.Min(VFL, 1900) : Math.Max(1100, VFL));
@@ -347,6 +356,12 @@ namespace ROV2019.Presenters
                 //throw new Exception("Thruster Speed Is (most likely) Missing.", e);
             }
 
+        }
+
+        private TValue TryGet<Tkey, TValue>(Tkey key, Dictionary<Tkey, TValue> values)
+        {
+            values.TryGetValue(key, out TValue ret);
+            return ret;
         }
 
         public override void Stop()

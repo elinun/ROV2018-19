@@ -51,5 +51,31 @@ namespace ROV2019.Views
         {
             connectionProperties.Trim.RollCorrection = RollTrackBar.Value;
         }
+
+        private void CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox cb = ((CheckBox)sender);
+            switch (cb.Name)
+            {
+                case "checkBoxLeft":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.Left] = cb.Checked;
+                    break;
+                case "checkBoxRight":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.Right] = cb.Checked;
+                    break;
+                case "checkBoxVFL":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.VerticalFrontLeft] = cb.Checked;
+                    break;
+                case "checkBoxVFR":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.VerticalFrontRight] = cb.Checked;
+                    break;
+                case "checkBoxVBL":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.VerticalBackLeft] = cb.Checked;
+                    break;
+                case "checkBoxVBR":
+                    connectionProperties.Trim.InvertedThrusters[Thrusters.VerticalBackRight] = cb.Checked;
+                    break;
+            }
+        }
     }
 }

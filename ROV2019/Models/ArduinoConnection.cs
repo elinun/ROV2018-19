@@ -32,5 +32,6 @@ namespace ROV2019.Models
         public int FrontToBackCorrection { get; set; }
         public int RollCorrection { get; set; }
         public int PitchCorrection { get; set; }
+        public Dictionary<Thrusters, bool> InvertedThrusters = new Dictionary<Thrusters, bool>();
     }
 }

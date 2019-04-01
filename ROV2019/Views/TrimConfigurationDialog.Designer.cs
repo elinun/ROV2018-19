@@ -44,6 +44,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.checkBoxLeft = new System.Windows.Forms.CheckBox();
+            this.checkBoxRight = new System.Windows.Forms.CheckBox();
+            this.checkBoxVFL = new System.Windows.Forms.CheckBox();
+            this.checkBoxVFR = new System.Windows.Forms.CheckBox();
+            this.checkBoxVBL = new System.Windows.Forms.CheckBox();
+            this.checkBoxVBR = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.RunTimeField)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ForwardTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.YawTrackBar)).BeginInit();
@@ -137,7 +144,7 @@
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(153, 386);
+            this.SaveButton.Location = new System.Drawing.Point(200, 386);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(75, 23);
             this.SaveButton.TabIndex = 8;
@@ -221,11 +228,93 @@
             this.label3.TabIndex = 17;
             this.label3.Text = "Don\'t use these buttons to move: Use controller.";
             // 
+            // checkBoxLeft
+            // 
+            this.checkBoxLeft.AutoSize = true;
+            this.checkBoxLeft.Location = new System.Drawing.Point(65, 259);
+            this.checkBoxLeft.Name = "checkBoxLeft";
+            this.checkBoxLeft.Size = new System.Drawing.Size(44, 17);
+            this.checkBoxLeft.TabIndex = 18;
+            this.checkBoxLeft.Text = "Left";
+            this.checkBoxLeft.UseVisualStyleBackColor = true;
+            this.checkBoxLeft.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // checkBoxRight
+            // 
+            this.checkBoxRight.AutoSize = true;
+            this.checkBoxRight.Location = new System.Drawing.Point(65, 282);
+            this.checkBoxRight.Name = "checkBoxRight";
+            this.checkBoxRight.Size = new System.Drawing.Size(51, 17);
+            this.checkBoxRight.TabIndex = 19;
+            this.checkBoxRight.Text = "Right";
+            this.checkBoxRight.UseVisualStyleBackColor = true;
+            this.checkBoxRight.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // checkBoxVFL
+            // 
+            this.checkBoxVFL.AutoSize = true;
+            this.checkBoxVFL.Location = new System.Drawing.Point(65, 305);
+            this.checkBoxVFL.Name = "checkBoxVFL";
+            this.checkBoxVFL.Size = new System.Drawing.Size(109, 17);
+            this.checkBoxVFL.TabIndex = 20;
+            this.checkBoxVFL.Text = "Vertical Front Left";
+            this.checkBoxVFL.UseVisualStyleBackColor = true;
+            this.checkBoxVFL.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // checkBoxVFR
+            // 
+            this.checkBoxVFR.AutoSize = true;
+            this.checkBoxVFR.Location = new System.Drawing.Point(65, 328);
+            this.checkBoxVFR.Name = "checkBoxVFR";
+            this.checkBoxVFR.Size = new System.Drawing.Size(116, 17);
+            this.checkBoxVFR.TabIndex = 21;
+            this.checkBoxVFR.Text = "Vertical Front Right";
+            this.checkBoxVFR.UseVisualStyleBackColor = true;
+            this.checkBoxVFR.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // checkBoxVBL
+            // 
+            this.checkBoxVBL.AutoSize = true;
+            this.checkBoxVBL.Location = new System.Drawing.Point(65, 351);
+            this.checkBoxVBL.Name = "checkBoxVBL";
+            this.checkBoxVBL.Size = new System.Drawing.Size(110, 17);
+            this.checkBoxVBL.TabIndex = 22;
+            this.checkBoxVBL.Text = "Vertical Back Left";
+            this.checkBoxVBL.UseVisualStyleBackColor = true;
+            this.checkBoxVBL.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // checkBoxVBR
+            // 
+            this.checkBoxVBR.AutoSize = true;
+            this.checkBoxVBR.Location = new System.Drawing.Point(65, 374);
+            this.checkBoxVBR.Name = "checkBoxVBR";
+            this.checkBoxVBR.Size = new System.Drawing.Size(117, 17);
+            this.checkBoxVBR.TabIndex = 23;
+            this.checkBoxVBR.Text = "Vertical Back Right";
+            this.checkBoxVBR.UseVisualStyleBackColor = true;
+            this.checkBoxVBR.CheckedChanged += new System.EventHandler(this.CheckedChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(86, 243);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(40, 13);
+            this.label4.TabIndex = 24;
+            this.label4.Text = "Invert?";
+            // 
             // TrimConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(543, 421);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.checkBoxVBR);
+            this.Controls.Add(this.checkBoxVBL);
+            this.Controls.Add(this.checkBoxVFR);
+            this.Controls.Add(this.checkBoxVFL);
+            this.Controls.Add(this.checkBoxRight);
+            this.Controls.Add(this.checkBoxLeft);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -271,5 +360,12 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBoxLeft;
+        private System.Windows.Forms.CheckBox checkBoxRight;
+        private System.Windows.Forms.CheckBox checkBoxVFL;
+        private System.Windows.Forms.CheckBox checkBoxVFR;
+        private System.Windows.Forms.CheckBox checkBoxVBL;
+        private System.Windows.Forms.CheckBox checkBoxVBR;
+        private System.Windows.Forms.Label label4;
     }
 }
