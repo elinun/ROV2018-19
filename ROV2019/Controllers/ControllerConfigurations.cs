@@ -162,7 +162,7 @@ namespace ROV2019.ControllerConfigurations
         };
         long prevTime = DateTime.Now.Ticks;
         //Units of microseconds pulse/elapsed milliseconds
-        readonly int maxRateOfChange = 1;
+        readonly double maxRateOfChange = 0.25;
 
         int prevClawOpenSpeed = 0;
         int prevClawRotateSpeed = 0;
@@ -304,27 +304,27 @@ namespace ROV2019.ControllerConfigurations
         {
             int elapsedMs = (int)(DateTime.Now.Ticks - prevTime);
             int prevLeft = prevVals[Thrusters.Left];
-            Left = ((Left - prevLeft) / elapsedMs <= maxRateOfChange) ? Left : prevLeft + (maxRateOfChange*elapsedMs);
+            Left = (int)(((Left - prevLeft) / elapsedMs <= maxRateOfChange) ? Left : prevLeft + (maxRateOfChange*elapsedMs));
             prevVals[Thrusters.Left] = Left;
 
             int prevRight = prevVals[Thrusters.Right];
-            Right = ((Right - prevRight) / elapsedMs <= maxRateOfChange) ? Right : prevRight + (maxRateOfChange * elapsedMs);
+            Right = (int)(((Right - prevRight) / elapsedMs <= maxRateOfChange) ? Right : prevRight + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.Right] = Right;
 
             int prevvfl = prevVals[Thrusters.VerticalFrontLeft];
-            vfl = ((vfl - prevvfl) / elapsedMs <= maxRateOfChange) ? vfl : prevvfl + (maxRateOfChange * elapsedMs);
+            vfl = (int)(((vfl - prevvfl) / elapsedMs <= maxRateOfChange) ? vfl : prevvfl + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.VerticalFrontLeft] = vfl;
 
             int prevvfr = prevVals[Thrusters.VerticalFrontRight];
-            vfr = ((vfr - prevvfr) / elapsedMs <= maxRateOfChange) ? vfr : prevvfr + (maxRateOfChange * elapsedMs);
+            vfr = (int)(((vfr - prevvfr) / elapsedMs <= maxRateOfChange) ? vfr : prevvfr + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.VerticalFrontRight] = vfr;
 
             int prevvbl = prevVals[Thrusters.VerticalBackLeft];
-            vbl = ((vbl - prevvbl) / elapsedMs <= maxRateOfChange) ? vbl : prevvbl + (maxRateOfChange * elapsedMs);
+            vbl = (int)(((vbl - prevvbl) / elapsedMs <= maxRateOfChange) ? vbl : prevvbl + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.VerticalBackLeft] = vbl;
 
             int prevvbr = prevVals[Thrusters.VerticalBackRight];
-            vbr = ((vbr - prevvbr) / elapsedMs <= maxRateOfChange) ? vbr : prevvbr + (maxRateOfChange * elapsedMs);
+            vbr = (int)(((vbr - prevvbr) / elapsedMs <= maxRateOfChange) ? vbr : prevvbr + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.VerticalBackRight] = vbr;
 
             prevTime = DateTime.Now.Ticks;

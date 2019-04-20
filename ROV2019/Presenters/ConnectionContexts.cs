@@ -151,7 +151,7 @@ namespace ROV2019.Presenters
                 command.AddParameter(value);
                 {
                     byte[] toWrite = command.GetCommandBytes();
-                    //stream.Write(toWrite, 0, toWrite.Length);
+                    stream.Write(toWrite, 0, toWrite.Length);
                     return true;
                 }
             }
@@ -224,6 +224,8 @@ namespace ROV2019.Presenters
             }
         }
 
+        //pin will not correspond to pin number for analog input pins being used
+        //for digitalWrite
         public bool DigitalWrite(int pin, bool on)
         {
             try

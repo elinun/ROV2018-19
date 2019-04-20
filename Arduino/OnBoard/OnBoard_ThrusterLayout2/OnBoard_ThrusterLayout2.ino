@@ -12,9 +12,13 @@ const int MPU_addr=0x68;
 bool Authorized = false;
 
 //Thrusters Left, Right, VerticalFrontLeft...
-Servo FL, FR, VFL, VFR, VBL, VBR, ClawOpen, ClawRotate;
-int ClawOpenPos, ClawRotatePos = 45;
-int ClawOpenSpeed, ClawRotateSpeed = 0;
+Servo FL, FR, VFL, VFR, VBL, VBR;
+Servo ClawOpen;
+Servo ClawRotate;
+int ClawOpenPos = 45;
+int ClawRotatePos = 45;
+int ClawOpenSpeed = 0;
+int ClawRotateSpeed = 0;
 
 EthernetServer server = EthernetServer(1740);
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  
@@ -45,13 +49,17 @@ void setup() {
   Wire.write((byte)16);
   Wire.endTransmission(true);
   
-  //Setup the pin to turn on the relay for the MicroROV
-  pinMode(A0, OUTPUT);
-  
   //Setup servos
-  ClawOpen.attach(11);
-  ClawRotate.attach(12);
+  ClawOpen.attach(A2);
+  ClawRotate.attach(9);
   //Setup anything else
+  pinMode(A0, OUTPUT);
+  pinMode(A3, OUTPUT);
+  pinMode(A4, OUTPUT);
+  pinMode(A5, OUTPUT);
+  digitalWrite(A3, HIGH);
+  digitalWrite(A4, HIGH);
+  digitalWrite(A5, HIGH);
   
   //Start Server
   server.begin();
@@ -65,7 +73,7 @@ void setup() {
   VBL.attach(7);
   VBR.attach(8);
 
-  //Send Stop signal
+  //Send Stop signal. This makes the chimes sound off letting us know we are done initializing.
   Stop();  
 }
 
@@ -73,25 +81,25 @@ void UpdateServoPositions()
 {
   ClawOpenPos += ClawOpenSpeed;
   ClawRotatePos += ClawRotateSpeed;
-  if(ClawOpenPos>0 && ClawOpenPos<180)
-  {
+  //delay introduced in while Client.Connected loop.
+  if(ClawOpenPos>0 && ClawOpenPos<180 && abs(ClawOpenSpeed) > 0)
+  {   
     ClawOpen.write(ClawOpenPos);
   }
-  if(ClawRotatePos>0 && ClawRotatePos<180)
+  if(ClawRotatePos>0 && ClawRotatePos<180 && abs(ClawRotateSpeed) >0)
   {
     ClawRotate.write(ClawRotatePos);
   }
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   EthernetClient client = server.available();
   if(client)
   {
-    Serial.println("Client Connected.");
+    //Serial.println("Client Connected.");
     while(client.connected())
     {
-      UpdateServoPositions();
+      UpdateServoPositions();   
       if(client.available())
       {
         //parse command from client stream
@@ -128,8 +136,9 @@ void loop() {
           pickCommand(client, commandName, parameters);
           
       }
-      delay(1);
+      delay(10);
     }
+    //Serial.println("Client disconnected.");
     Stop();
     Authorized = false;
   }
@@ -195,7 +204,6 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       params[i].toCharArray(str, params[i].length()+1);
       parameters[i] = atoi(str);
     }
-
     switch(parameters[0])
     {
         case 0:
@@ -222,7 +230,32 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       params[i].toCharArray(str, params[i].length()+1);
       parameters[i] = atoi(str);
     }
-    digitalWrite(parameters[0], parameters[1]);
+    int pin;
+    if(parameters[0]<10)
+    {
+      pin = parameters[0];
+    }
+    else{
+      switch(parameters[0])
+      {
+        case 10:
+          pin = A0;
+          break;
+        case 11:
+          pin = A2;
+          break;
+        case 12:
+          pin = A3;
+          break;
+        case 13:
+          pin = A4;
+          break;
+        case 14:
+          pin = A5;
+          break;
+      }
+    }
+    digitalWrite(pin, parameters[1]);
   }
 }
 

@@ -51,7 +51,7 @@ namespace ROV2019
             this.TimerLabel = new System.Windows.Forms.Label();
             this.StartButton = new System.Windows.Forms.Button();
             this.ResetButton = new System.Windows.Forms.Button();
-            this.menuStrip1.SuspendLayout();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ConnectionsList
@@ -263,12 +263,23 @@ namespace ROV2019
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(0, 0);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 17;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(722, 411);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.ResetButton);
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.TimerLabel);
@@ -290,8 +301,6 @@ namespace ROV2019
             this.Name = "Main";
             this.Text = "CHS ROV 2K19";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -318,6 +327,7 @@ namespace ROV2019
         private System.Windows.Forms.Label TimerLabel;
         private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.Button ResetButton;
+        private System.Windows.Forms.Button button1;
     }
 }
 

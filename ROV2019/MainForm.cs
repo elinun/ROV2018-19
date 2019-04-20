@@ -399,5 +399,11 @@ namespace ROV2019
         }
 
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //new ShapeDetector().Show();
+            new FormShapeDetection().Show();
+        }
     }
 }
