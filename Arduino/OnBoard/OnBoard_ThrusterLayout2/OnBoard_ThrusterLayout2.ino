@@ -54,12 +54,10 @@ void setup() {
   ClawRotate.attach(9);
   //Setup anything else
   pinMode(A0, OUTPUT);
+  pinMode(A1, OUTPUT);
   pinMode(A3, OUTPUT);
-  pinMode(A4, OUTPUT);
-  pinMode(A5, OUTPUT);
   digitalWrite(A3, HIGH);
-  digitalWrite(A4, HIGH);
-  digitalWrite(A5, HIGH);
+  digitalWrite(A1, HIGH);
   
   //Start Server
   server.begin();
@@ -230,32 +228,7 @@ void pickCommand(EthernetClient client, String name, std::vector<String> params)
       params[i].toCharArray(str, params[i].length()+1);
       parameters[i] = atoi(str);
     }
-    int pin;
-    if(parameters[0]<10)
-    {
-      pin = parameters[0];
-    }
-    else{
-      switch(parameters[0])
-      {
-        case 10:
-          pin = A0;
-          break;
-        case 11:
-          pin = A2;
-          break;
-        case 12:
-          pin = A3;
-          break;
-        case 13:
-          pin = A4;
-          break;
-        case 14:
-          pin = A5;
-          break;
-      }
-    }
-    digitalWrite(pin, parameters[1]);
+    digitalWrite(parameters[0], parameters[1]);
   }
 }
 
