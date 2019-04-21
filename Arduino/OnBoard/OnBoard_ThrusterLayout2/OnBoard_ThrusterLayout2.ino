@@ -50,14 +50,14 @@ void setup() {
   Wire.endTransmission(true);
   
   //Setup servos
-  ClawOpen.attach(A2);
+  ClawOpen.attach(A3);
   ClawRotate.attach(9);
   //Setup anything else
   pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);
-  pinMode(A3, OUTPUT);
-  digitalWrite(A3, HIGH);
-  digitalWrite(A1, HIGH);
+  pinMode(A2, OUTPUT);
+  digitalWrite(A2, HIGH);
+  digitalWrite(A0, HIGH);
   
   //Start Server
   server.begin();

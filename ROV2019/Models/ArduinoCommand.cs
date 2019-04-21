@@ -113,8 +113,8 @@ namespace ROV2019.Models
     public enum Accessories
     {
         //correspond to pin numbers
-        Laser = 14,
-        MicroPropeller = 17,
-        TetherWinder = 15
+        Laser = 15,
+        MicroPropeller = 14,
+        TetherWinder = 16
     }
 }
