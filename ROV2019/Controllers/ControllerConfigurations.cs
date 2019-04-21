@@ -253,12 +253,12 @@ namespace ROV2019.ControllerConfigurations
             }
 
             Dictionary<int, int?> servoSpeeds = new Dictionary<int, int?>();
-            if(controller.Buttons[0])
+            if(controller.Buttons[1])
             {
                 if (prevClawOpenSpeed >= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawOpen] = -3;
-                    prevClawOpenSpeed = -3;
+                    servoSpeeds[(int)Servos.ClawOpen] = -1;
+                    prevClawOpenSpeed = -1;
                 }
                     
             }
@@ -268,11 +268,11 @@ namespace ROV2019.ControllerConfigurations
                 prevClawOpenSpeed = 0;
             }
 
-            if (controller.Buttons[2])
+            if (controller.Buttons[3])
             {
                 if (prevClawOpenSpeed <= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawOpen] = 3;
+                    servoSpeeds[(int)Servos.ClawOpen] = 1;
                     prevClawOpenSpeed = 1;
                 }
             }
@@ -282,11 +282,11 @@ namespace ROV2019.ControllerConfigurations
                 prevClawOpenSpeed = 0;
             }
 
-            if (controller.Buttons[1])
+            if (controller.Buttons[0])
             {
                 if (prevClawRotateSpeed >= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawRotate] = -3;
+                    servoSpeeds[(int)Servos.ClawRotate] = -1;
                     prevClawRotateSpeed = -1;
                 }
             }
@@ -296,11 +296,11 @@ namespace ROV2019.ControllerConfigurations
                 prevClawRotateSpeed = 0;
             }
 
-            if (controller.Buttons[3])
+            if (controller.Buttons[2])
             {
                 if (prevClawRotateSpeed <= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawRotate] = 3;
+                    servoSpeeds[(int)Servos.ClawRotate] = 1;
                     prevClawRotateSpeed = 1;
                 }
             }

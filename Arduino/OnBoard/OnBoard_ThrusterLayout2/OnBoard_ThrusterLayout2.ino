@@ -4,7 +4,7 @@
 #include<Ethernet.h>
 #include <stdio.h>
 
-#define PASSWORD "password" //change this to the actual password
+#define PASSWORD "p" //change this to the actual password
 #define ROV_NAME "Innovocean X" //16 character max, please
 
 const int MPU_addr=0x68; 
@@ -77,15 +77,25 @@ void setup() {
 
 void UpdateServoPositions()
 {
-  ClawOpenPos += ClawOpenSpeed;
-  ClawRotatePos += ClawRotateSpeed;
   //delay introduced in while Client.Connected loop.
-  if(ClawOpenPos>0 && ClawOpenPos<180 && abs(ClawOpenSpeed) > 0)
+  
+  //prevent position from getting "stuck" and not allow it to go over or under
+  if((ClawOpenPos <= 0 && ClawOpenSpeed>0) || (ClawOpenPos >= 90 && ClawOpenSpeed < 0))
+  {
+    ClawOpenPos += ClawOpenSpeed;
+  }
+  if((ClawRotatePos <= 0 && ClawRotateSpeed>0) || (ClawRotatePos >= 180 && ClawRotateSpeed < 0))
+  {
+    ClawRotatePos += ClawRotateSpeed;
+  }
+  if(ClawOpenPos>0 && ClawOpenPos<90 && abs(ClawOpenSpeed) > 0)
   {   
+    ClawOpenPos += ClawOpenSpeed;
     ClawOpen.write(ClawOpenPos);
   }
   if(ClawRotatePos>0 && ClawRotatePos<180 && abs(ClawRotateSpeed) >0)
   {
+    ClawRotatePos += ClawRotateSpeed;
     ClawRotate.write(ClawRotatePos);
   }
 }
