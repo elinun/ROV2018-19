@@ -112,7 +112,9 @@ namespace ROV2019.Models
 
     public enum Accessories
     {
-        GoGoMotor = 1,
-        TetherWinder = 9
+        //correspond to pin numbers
+        Laser = 14,
+        MicroPropeller = 17,
+        TetherWinder = 15
     }
 }

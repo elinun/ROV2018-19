@@ -18,7 +18,7 @@ namespace ROV2019.Presenters
         public bool IsMeshing = false;
         public bool IsUsingPID = true;
 
-        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 350)
+        public ConnectionControllerMesher(ConnectionContext connection, ControllerConfiguration configuration, int PollRate = 100)
         {
             conn = connection;
             config = configuration;
@@ -59,8 +59,8 @@ namespace ROV2019.Presenters
                 //Accessories
                 bool? GoGoOn;
                 bool? WinderOn;
-                if ((GoGoOn = Utilities.TryGet((int)Accessories.GoGoMotor, data.Accessories)) != null)
-                    conn.DigitalWrite((int)Accessories.GoGoMotor, (bool)GoGoOn);
+                if ((GoGoOn = Utilities.TryGet((int)Accessories.MicroPropeller, data.Accessories)) != null)
+                    conn.DigitalWrite((int)Accessories.MicroPropeller, (bool)GoGoOn);
 
                 if ((WinderOn = Utilities.TryGet((int)Accessories.TetherWinder, data.Accessories)) != null)
                     conn.DigitalWrite((int)Accessories.TetherWinder, (bool)WinderOn);

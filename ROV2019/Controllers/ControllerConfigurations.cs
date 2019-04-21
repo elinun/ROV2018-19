@@ -167,8 +167,8 @@ namespace ROV2019.ControllerConfigurations
         int prevClawOpenSpeed = 0;
         int prevClawRotateSpeed = 0;
 
-        bool goGoMotorPreviouslyOn = false;
-        bool tetherWinderPreviouslyOn = false;
+        bool goGoMotorOn = false;
+        bool tetherWinderOn = false;
 
         Controller controller;
         public Helicopter(Controller c) : base(c)
@@ -210,35 +210,55 @@ namespace ROV2019.ControllerConfigurations
 
             //Servos and Micro
             Dictionary<int, bool?> accessories = new Dictionary<int, bool?>();
-            if (controller.Buttons[5])
+            ///VERY VERY IMPORTANT!!!
+            ///THE MOTOR AND WINDER CAN NOT BE ON AT THE SAME TIME!!!
+            ///THE VOLTAGE REGULATOR WILL GET SHORTED IF THEY ARE!!!
+            if (!tetherWinderOn)
             {
-                if(!goGoMotorPreviouslyOn)
-                    accessories[(int)Accessories.GoGoMotor] = true;
-            }
-            else if(goGoMotorPreviouslyOn)
-            {
-                accessories[(int)Accessories.GoGoMotor] = false;
-            }
-            goGoMotorPreviouslyOn = controller.Buttons[5];
+                if (controller.Buttons[5])
+                {
+                    if (!goGoMotorOn)
+                    {
+                        accessories[(int)Accessories.MicroPropeller] = !true;
+                        goGoMotorOn = true;
+                    }
 
-            if (controller.Buttons[4])
-            {
-                if (!tetherWinderPreviouslyOn)
-                    accessories[(int)Accessories.TetherWinder] = true;
+                }
+                else if (goGoMotorOn)
+                {
+                    accessories[(int)Accessories.MicroPropeller] = !false;
+                    goGoMotorOn = false;
+                }
             }
-            else if (tetherWinderPreviouslyOn)
+
+            ///VERY VERY IMPORTANT!!!
+            ///THE MOTOR AND WINDER CAN NOT BE ON AT THE SAME TIME!!!
+            ///THE VOLTAGE REGULATOR WILL GET SHORTED IF THEY ARE!!!
+            if (!goGoMotorOn)
             {
-                accessories[(int)Accessories.TetherWinder] = false;
+
+                if (controller.Buttons[4])
+                {
+                    if (!tetherWinderOn)
+                    {
+                        accessories[(int)Accessories.TetherWinder] = !true;
+                        tetherWinderOn = true;
+                    }
+                }
+                else if (tetherWinderOn)
+                {
+                    accessories[(int)Accessories.TetherWinder] = !false;
+                    tetherWinderOn = false;
+                }
             }
-            tetherWinderPreviouslyOn = controller.Buttons[4];
 
             Dictionary<int, int?> servoSpeeds = new Dictionary<int, int?>();
             if(controller.Buttons[0])
             {
                 if (prevClawOpenSpeed >= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawOpen] = -1;
-                    prevClawOpenSpeed = -1;
+                    servoSpeeds[(int)Servos.ClawOpen] = -3;
+                    prevClawOpenSpeed = -3;
                 }
                     
             }
@@ -252,7 +272,7 @@ namespace ROV2019.ControllerConfigurations
             {
                 if (prevClawOpenSpeed <= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawOpen] = 1;
+                    servoSpeeds[(int)Servos.ClawOpen] = 3;
                     prevClawOpenSpeed = 1;
                 }
             }
@@ -266,7 +286,7 @@ namespace ROV2019.ControllerConfigurations
             {
                 if (prevClawRotateSpeed >= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawRotate] = -1;
+                    servoSpeeds[(int)Servos.ClawRotate] = -3;
                     prevClawRotateSpeed = -1;
                 }
             }
@@ -280,7 +300,7 @@ namespace ROV2019.ControllerConfigurations
             {
                 if (prevClawRotateSpeed <= 0)
                 {
-                    servoSpeeds[(int)Servos.ClawRotate] = 1;
+                    servoSpeeds[(int)Servos.ClawRotate] = 3;
                     prevClawRotateSpeed = 1;
                 }
             }
