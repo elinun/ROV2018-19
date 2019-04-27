@@ -59,11 +59,14 @@ namespace ROV2019.Presenters
                 //Accessories
                 bool? GoGoOn;
                 bool? WinderOn;
+                bool? LaserOn;
                 if ((GoGoOn = Utilities.TryGet((int)Accessories.MicroPropeller, data.Accessories)) != null)
                     conn.DigitalWrite((int)Accessories.MicroPropeller, (bool)GoGoOn);
 
                 if ((WinderOn = Utilities.TryGet((int)Accessories.TetherWinder, data.Accessories)) != null)
                     conn.DigitalWrite((int)Accessories.TetherWinder, (bool)WinderOn);
+                if ((LaserOn = Utilities.TryGet((int)Accessories.Laser, data.Accessories)) != null)
+                    conn.DigitalWrite((int)Accessories.Laser, (bool)LaserOn);
 
                 Thread.Sleep(PollInterval);
             }

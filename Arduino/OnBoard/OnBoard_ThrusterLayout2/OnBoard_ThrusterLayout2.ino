@@ -16,7 +16,7 @@ Servo FL, FR, VFL, VFR, VBL, VBR;
 Servo ClawOpen;
 Servo ClawRotate;
 int ClawOpenPos = 45;
-int ClawRotatePos = 45;
+int ClawRotatePos = 90;
 int ClawOpenSpeed = 0;
 int ClawRotateSpeed = 0;
 
@@ -50,8 +50,10 @@ void setup() {
   Wire.endTransmission(true);
   
   //Setup servos
-  ClawOpen.attach(A3);
-  ClawRotate.attach(9);
+  ClawOpen.attach(9);
+  ClawRotate.attach(A3);
+  ClawOpen.write(ClawOpenPos);
+  ClawRotate.write(ClawRotatePos);
   //Setup anything else
   pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);

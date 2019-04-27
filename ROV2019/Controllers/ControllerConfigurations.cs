@@ -185,17 +185,22 @@ namespace ROV2019.ControllerConfigurations
             //TODO: Add logic to move straight forward when tilted (pitched).
             int L = 1500 + controller.X + controller.Y;
             int R = 1500 + controller.X - controller.Y;
-            int VFL = 1500 + controller.RotationZ + controller.Z;
-            int VFR = 1500 + controller.RotationZ - controller.Z;
-            int VBL = 1500 - controller.RotationZ + controller.Z;
-            int VBR = 1500 - controller.RotationZ - controller.Z;
+            //int VFL = 1500 + controller.RotationZ + controller.Z;
+            //int VFR = 1500 + controller.RotationZ - controller.Z;
+            //int VBL = 1500 - controller.RotationZ + controller.Z;
+            //int VBR = 1500 - controller.RotationZ - controller.Z;
 
-            L = L > 0 ? Math.Min(L, 1900) : Math.Max(1100, L);
-            R = R > 0 ? Math.Min(R, 1900) : Math.Max(1100, R);
-            VFL = VFL > 0 ? Math.Min(VFL, 1900) : Math.Max(1100, VFL);
-            VBL = VBL > 0 ? Math.Min(VBL, 1900) : Math.Max(1100, VBL);
-            VBR = VBR > 0 ? Math.Min(VBR, 1900) : Math.Max(1100, VBR);
-            VFR = VFR > 0 ? Math.Min(VFR, 1900) : Math.Max(1100, VFR);
+            int VFL = 1500+controller.RotationY - controller.RotationX;
+            int VFR = 1500+controller.RotationY - controller.RotationX;
+            int VBL = 1500+controller.RotationY - controller.RotationX;
+            int VBR = 1500+controller.RotationY - controller.RotationX;
+
+            L = L > 0 ? Math.Min(L, 1650) : Math.Max(1350, L);
+            R = R > 0 ? Math.Min(R, 1650) : Math.Max(1350, R);
+            VFL = VFL > 0 ? Math.Min(VFL, 1650) : Math.Max(1350, VFL);
+            VBL = VBL > 0 ? Math.Min(VBL, 1650) : Math.Max(1350, VBL);
+            VBR = VBR > 0 ? Math.Min(VBR, 1650) : Math.Max(1350, VBR);
+            VFR = VFR > 0 ? Math.Min(VFR, 1650) : Math.Max(1350, VFR);
 
             //Optional after we add the separate regulator for arduino
             //CheckRateOfChange(ref L, ref R, ref VFL, ref VFR, ref VBL, ref VBR);
@@ -213,6 +218,7 @@ namespace ROV2019.ControllerConfigurations
             ///VERY VERY IMPORTANT!!!
             ///THE MOTOR AND WINDER CAN NOT BE ON AT THE SAME TIME!!!
             ///THE VOLTAGE REGULATOR WILL GET SHORTED IF THEY ARE!!!
+            ///Oh, and there is nothing in the Arduino code to stop this
             if (!tetherWinderOn)
             {
                 if (controller.Buttons[5])
@@ -325,6 +331,231 @@ namespace ROV2019.ControllerConfigurations
             int elapsedMs = (int)(DateTime.Now.Ticks - prevTime);
             int prevLeft = prevVals[Thrusters.Left];
             Left = (int)(((Left - prevLeft) / elapsedMs <= maxRateOfChange) ? Left : prevLeft + (maxRateOfChange*elapsedMs));
+            prevVals[Thrusters.Left] = Left;
+
+            int prevRight = prevVals[Thrusters.Right];
+            Right = (int)(((Right - prevRight) / elapsedMs <= maxRateOfChange) ? Right : prevRight + (maxRateOfChange * elapsedMs));
+            prevVals[Thrusters.Right] = Right;
+
+            int prevvfl = prevVals[Thrusters.VerticalFrontLeft];
+            vfl = (int)(((vfl - prevvfl) / elapsedMs <= maxRateOfChange) ? vfl : prevvfl + (maxRateOfChange * elapsedMs));
+            prevVals[Thrusters.VerticalFrontLeft] = vfl;
+
+            int prevvfr = prevVals[Thrusters.VerticalFrontRight];
+            vfr = (int)(((vfr - prevvfr) / elapsedMs <= maxRateOfChange) ? vfr : prevvfr + (maxRateOfChange * elapsedMs));
+            prevVals[Thrusters.VerticalFrontRight] = vfr;
+
+            int prevvbl = prevVals[Thrusters.VerticalBackLeft];
+            vbl = (int)(((vbl - prevvbl) / elapsedMs <= maxRateOfChange) ? vbl : prevvbl + (maxRateOfChange * elapsedMs));
+            prevVals[Thrusters.VerticalBackLeft] = vbl;
+
+            int prevvbr = prevVals[Thrusters.VerticalBackRight];
+            vbr = (int)(((vbr - prevvbr) / elapsedMs <= maxRateOfChange) ? vbr : prevvbr + (maxRateOfChange * elapsedMs));
+            prevVals[Thrusters.VerticalBackRight] = vbr;
+
+            prevTime = DateTime.Now.Ticks;
+        }
+    }
+
+    public class Amelie : ControllerConfiguration
+    {
+        Dictionary<Thrusters, int> prevVals = new Dictionary<Thrusters, int>()
+        {
+            {Thrusters.Left, 1500 },
+            {Thrusters.Right, 1500 },
+            {Thrusters.VerticalBackLeft, 1500 },
+            { Thrusters.VerticalBackRight, 1500 },
+            {Thrusters.VerticalFrontLeft, 1500 },
+            {Thrusters.VerticalFrontRight, 1500 }
+        };
+        long prevTime = DateTime.Now.Ticks;
+        //Units of microseconds pulse/elapsed milliseconds
+        readonly double maxRateOfChange = 0.25;
+
+        int prevClawOpenSpeed = 0;
+        int prevClawRotateSpeed = 0;
+
+        bool goGoMotorOn = false;
+        bool tetherWinderOn = false;
+        bool laserOn = !true;
+        bool canChangeLaserState = false;
+
+        Controller controller;
+        public Amelie(Controller c) : base(c)
+        {
+            controller = c;
+            //Configuration for when we have 4 vertical thrusters.
+            Layout = ThrusterLayout.TL2;
+        }
+
+        public override ConfiguredPollData Poll()
+        {
+            //TODO: Implement configuration
+            controller.Poll();
+            //TODO: Add logic to move straight forward when tilted (pitched).
+            int fwdBack = controller.RotationY > 10 ? controller.RotationY : -controller.RotationX;
+            int L = 1500 + fwdBack + controller.X;
+            int R = 1500 + fwdBack - controller.X;
+            //int VFL = 1500 + controller.RotationZ + controller.Z;
+            //int VFR = 1500 + controller.RotationZ - controller.Z;
+            //int VBL = 1500 - controller.RotationZ + controller.Z;
+            //int VBR = 1500 - controller.RotationZ - controller.Z;
+
+            int VFL = 1500 + controller.RotationZ;// - controller.RotationX;
+            int VFR = 1500 + controller.RotationZ;// - controller.RotationX;
+            int VBL = 1500 + controller.RotationZ;// - controller.RotationX;
+            int VBR = 1500 + controller.RotationZ;// - controller.RotationX;
+
+            L = L > 0 ? Math.Min(L, 1650) : Math.Max(1350, L);
+            R = R > 0 ? Math.Min(R, 1650) : Math.Max(1350, R);
+            VFL = VFL > 0 ? Math.Min(VFL, 1650) : Math.Max(1350, VFL);
+            VBL = VBL > 0 ? Math.Min(VBL, 1650) : Math.Max(1350, VBL);
+            VBR = VBR > 0 ? Math.Min(VBR, 1650) : Math.Max(1350, VBR);
+            VFR = VFR > 0 ? Math.Min(VFR, 1650) : Math.Max(1350, VFR);
+
+            //Optional after we add the separate regulator for arduino
+            //CheckRateOfChange(ref L, ref R, ref VFL, ref VFR, ref VBL, ref VBR);
+
+            Dictionary<Thrusters, int> thrusterSpeeds = new Dictionary<Thrusters, int>();
+            thrusterSpeeds.Add(Thrusters.Left, L);
+            thrusterSpeeds.Add(Thrusters.Right, R);
+            thrusterSpeeds.Add(Thrusters.VerticalFrontLeft, VFL);
+            thrusterSpeeds.Add(Thrusters.VerticalFrontRight, VFR);
+            thrusterSpeeds.Add(Thrusters.VerticalBackLeft, VBL);
+            thrusterSpeeds.Add(Thrusters.VerticalBackRight, VBR);
+
+            //Servos and Micro
+            Dictionary<int, bool?> accessories = new Dictionary<int, bool?>();
+
+            if(controller.Buttons[13])
+            {
+                if (canChangeLaserState)
+                {
+                    accessories[(int)Accessories.Laser] = !laserOn;
+                    laserOn = !laserOn;
+                }
+                canChangeLaserState = false;
+            }
+            else
+            {
+                canChangeLaserState = true;
+            }
+            ///VERY VERY IMPORTANT!!!
+            ///THE MOTOR AND WINDER CAN NOT BE ON AT THE SAME TIME!!!
+            ///THE VOLTAGE REGULATOR WILL GET SHORTED IF THEY ARE!!!
+            ///Oh, and there is nothing in the Arduino code to stop this
+            if (!tetherWinderOn)
+            {
+                if (controller.Buttons[5])
+                {
+                    if (!goGoMotorOn)
+                    {
+                        accessories[(int)Accessories.MicroPropeller] = !true;
+                        goGoMotorOn = true;
+                    }
+
+                }
+                else if (goGoMotorOn)
+                {
+                    accessories[(int)Accessories.MicroPropeller] = !false;
+                    goGoMotorOn = false;
+                }
+            }
+
+            ///VERY VERY IMPORTANT!!!
+            ///THE MOTOR AND WINDER CAN NOT BE ON AT THE SAME TIME!!!
+            ///THE VOLTAGE REGULATOR WILL GET SHORTED IF THEY ARE!!!
+            if (!goGoMotorOn)
+            {
+
+                if (controller.Buttons[4])
+                {
+                    if (!tetherWinderOn)
+                    {
+                        accessories[(int)Accessories.TetherWinder] = !true;
+                        tetherWinderOn = true;
+                    }
+                }
+                else if (tetherWinderOn)
+                {
+                    accessories[(int)Accessories.TetherWinder] = !false;
+                    tetherWinderOn = false;
+                }
+            }
+
+            Dictionary<int, int?> servoSpeeds = new Dictionary<int, int?>();
+            if (controller.Buttons[1])
+            {
+                if (prevClawOpenSpeed >= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawOpen] = -1;
+                    prevClawOpenSpeed = -1;
+                }
+
+            }
+            else if (prevClawOpenSpeed < 0)
+            {
+                servoSpeeds[(int)Servos.ClawOpen] = 0;
+                prevClawOpenSpeed = 0;
+            }
+
+            if (controller.Buttons[3])
+            {
+                if (prevClawOpenSpeed <= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawOpen] = 1;
+                    prevClawOpenSpeed = 1;
+                }
+            }
+            else if (prevClawOpenSpeed > 0)
+            {
+                servoSpeeds[(int)Servos.ClawOpen] = 0;
+                prevClawOpenSpeed = 0;
+            }
+
+            if (controller.Buttons[0])
+            {
+                if (prevClawRotateSpeed >= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawRotate] = -1;
+                    prevClawRotateSpeed = -1;
+                }
+            }
+            else if (prevClawRotateSpeed < 0)
+            {
+                servoSpeeds[(int)Servos.ClawRotate] = 0;
+                prevClawRotateSpeed = 0;
+            }
+
+            if (controller.Buttons[2])
+            {
+                if (prevClawRotateSpeed <= 0)
+                {
+                    servoSpeeds[(int)Servos.ClawRotate] = 1;
+                    prevClawRotateSpeed = 1;
+                }
+            }
+            else if (prevClawRotateSpeed > 0)
+            {
+                servoSpeeds[(int)Servos.ClawRotate] = 0;
+                prevClawRotateSpeed = 0;
+            }
+
+            ConfiguredPollData data = new ConfiguredPollData()
+            {
+                ThrusterSpeeds = thrusterSpeeds,
+                Accessories = accessories,
+                ServoSpeeds = servoSpeeds
+            };
+            return data;
+        }
+
+        //Makes sure that the thrusters are not speeding up too fast in order to prevent voltage drop.
+        private void CheckRateOfChange(ref int Left, ref int Right, ref int vfl, ref int vfr, ref int vbl, ref int vbr)
+        {
+            int elapsedMs = (int)(DateTime.Now.Ticks - prevTime);
+            int prevLeft = prevVals[Thrusters.Left];
+            Left = (int)(((Left - prevLeft) / elapsedMs <= maxRateOfChange) ? Left : prevLeft + (maxRateOfChange * elapsedMs));
             prevVals[Thrusters.Left] = Left;
 
             int prevRight = prevVals[Thrusters.Right];

@@ -82,7 +82,8 @@
             this.ConfigurationComboBox.FormattingEnabled = true;
             this.ConfigurationComboBox.Items.AddRange(new object[] {
             "Arcade",
-            "Helicopter"});
+            "Helicopter",
+            "Amelie"});
             this.ConfigurationComboBox.Location = new System.Drawing.Point(98, 27);
             this.ConfigurationComboBox.Name = "ConfigurationComboBox";
             this.ConfigurationComboBox.Size = new System.Drawing.Size(121, 21);
